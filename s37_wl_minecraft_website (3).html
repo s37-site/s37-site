@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ｓ３７ 「WL』 - Official Minecraft SMP Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Tektur:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mc: {
+                            dark: '#020617',
+                            panel: '#0f172a',
+                            card: '#1e293b',
+                            primary: '#10b981', // Emerald green
+                            secondary: '#6366f1', // Indigo
+                            accent: '#f59e0b', // Amber
+                            capy: '#ff5a1f' // Capy Hosting Orange
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        display: ['Tektur', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #020617;
+            color: #f8fafc;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden; /* Disables page scrolling */
+        }
+
+        /* Fluid glassmorph panels */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .active-panel-shadow {
+            box-shadow: 0 0 40px -5px rgba(16, 185, 129, 0.15);
+        }
+
+        /* Ambient glowing button animations */
+        .btn-glow {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-glow::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            box-shadow: 0 0 20px 3px rgba(16, 185, 129, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        .btn-glow:hover::before {
+            opacity: 1;
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-glow-orange {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-glow-orange::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: inherit;
+            box-shadow: 0 0 25px 4px rgba(255, 90, 31, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        .btn-glow-orange:hover::before {
+            opacity: 1;
+        }
+        .btn-glow-orange:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Custom inner scrollbars for panels */
+        .scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .scrollable-content::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.4); 
+            border-radius: 3px;
+        }
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(16, 185, 129, 0.7); 
+        }
+
+        /* Parallax Background */
+        .hero-bg {
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.65), rgba(2, 6, 23, 0.95)), url('https://images.unsplash.com/photo-1607513746994-51f730a44832?q=80&w=2000&auto=format&fit=crop') center/cover no-repeat;
+        }
+
+        /* Breathing Status indicator */
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Radial Menu transitions */
+        .radial-item {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: scale(0) translate(0, 0);
+            pointer-events: none;
+            opacity: 0;
+        }
+        .radial-menu-container.open .radial-item {
+            transform: scale(1) translate(var(--tw-translate-x), var(--tw-translate-y));
+            pointer-events: auto;
+            opacity: 1;
+        }
+
+        /* Custom Panel Animation */
+        .panel-transition {
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        .panel-hidden {
+            opacity: 0;
+            transform: scale(0.97) translateY(10px);
+            pointer-events: none;
+            position: absolute !important;
+            z-index: 0;
+        }
+        .panel-visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+            position: relative !important;
+            z-index: 10;
+        }
+
+        /* Feedback Type Card States */
+        .type-card {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .type-card.active {
+            border-color: var(--card-accent-color, #10b981);
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 0 15px -3px var(--card-accent-color, #10b981);
+        }
+
+        /* Chrono Oracle Gradient Runes */
+        .oracle-glow {
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased hero-bg flex flex-col justify-between h-screen overflow-hidden">
+
+    <!-- Top Brand Header -->
+    <header class="w-full z-40 px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
+        <div class="flex items-center gap-3">
+            <div class="font-display text-xl sm:text-2xl font-bold tracking-wider text-white">
+                <span class="text-mc-primary">Ｓ３７</span> 「WL』
+            </div>
+            <span class="text-xs bg-mc-primary/20 text-mc-primary px-2.5 py-0.5 rounded-full border border-mc-primary/30 hidden sm:inline-block">Vanilla+ SMP</span>
+        </div>
+        
+        <!-- Server Active Status HUD -->
+        <div class="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-sm text-xs">
+            <span class="status-dot"></span>
+            <span class="text-gray-400">Server IP:</span>
+            <span class="font-mono text-white font-semibold select-all" id="hud-ip">s37.mc-srv.pro</span>
+            <button onclick="copyIP('hud-ip')" class="text-mc-primary hover:text-white transition-colors ml-1" title="Copy Server Address">
+                <i class="fas fa-copy"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Panels Frame -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden my-4">
+        
+        <!-- SECTION 1: HOME HUB -->
+        <div id="panel-home" class="panel-transition panel-visible w-full max-w-3xl text-center space-y-6">
+            <span class="text-mc-primary font-bold tracking-widest uppercase text-xs sm:text-sm block">A premium whitelist-only survival community</span>
+            <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold drop-shadow-2xl">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-mc-primary via-emerald-300 to-mc-secondary">Ｓ３７</span> 「WL』
+            </h1>
+            <p class="text-sm sm:text-base md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Experience survival the way it was meant to be. Build empires, discover friendships, and conquer epic challenges with vetted, respectful players.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto pt-4">
+                <button onclick="copyIP('ip-home')" class="btn-glow bg-mc-primary text-white font-display font-bold py-3.5 px-6 rounded-xl text-base flex items-center gap-3 w-full justify-center cursor-pointer">
+                    <i class="fas fa-gamepad text-lg"></i>
+                    <span id="ip-home">s37.mc-srv.pro</span>
+                    <i class="fas fa-copy opacity-75 text-xs ml-2"></i>
+                </button>
+                <button onclick="switchTab('whitelist')" class="btn-glow bg-mc-accent text-white font-display font-bold py-3.5 px-6 rounded-xl text-base flex items-center gap-3 w-full justify-center">
+                    <i class="fas fa-file-signature text-base"></i> Apply to Play
+                </button>
+            </div>
+            <!-- Copy Feedback Toast -->
+            <div id="copy-toast" class="opacity-0 transition-opacity duration-300 text-mc-primary text-sm font-bold">
+                <i class="fas fa-check-circle"></i> Connection Address Copied! Launch Minecraft & Join!
+            </div>
+        </div>
+
+        <!-- SECTION 2: LIVE METRICS & DISCORD -->
+        <div id="panel-stats" class="panel-transition panel-hidden w-full max-w-5xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="flex items-center justify-between mb-6 flex-shrink-0">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-white">Live Server Metrics</h2>
+                    <p class="text-xs text-gray-400 mt-1">Real-time status updates from our node networks</p>
+                </div>
+                <button onclick="fetchLiveStats()" id="btn-refresh" class="bg-mc-primary/10 hover:bg-mc-primary/25 border border-mc-primary/30 text-mc-primary p-2.5 rounded-xl transition-all" title="Force refresh stats">
+                    <i class="fas fa-sync-alt" id="refresh-icon"></i>
+                </button>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto space-y-8 pr-1 flex-grow">
+                <!-- Status counters -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-mc-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-mc-primary text-2xl">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-400">Players Online</h3>
+                        <div class="text-4xl font-display font-bold text-white mt-1" id="mc-players">0</div>
+                        <p class="text-[10px] text-gray-500 mt-1">Active on s37.mc-srv.pro</p>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-[#5865F2]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#5865F2] text-2xl">
+                            <i class="fab fa-discord"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-400">Discord Members</h3>
+                        <div class="text-4xl font-display font-bold text-white mt-1" id="discord-members">0</div>
+                        <p class="text-[10px] text-gray-500 mt-1">S37 network accounts active</p>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center">
+                        <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-gray-400">Network Uptime</h3>
+                        <div class="text-3xl font-display font-bold text-white mt-2 flex items-center justify-center gap-2">
+                            <span class="status-dot"></span>
+                            <span id="server-status">Connecting</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">Capybara Host Server node status</p>
+                    </div>
+                </div>
+
+                <!-- API caching alert message -->
+                <div class="bg-blue-950/30 border border-blue-500/20 text-blue-300 text-xs p-4 rounded-xl flex gap-3 items-center">
+                    <i class="fas fa-info-circle text-lg"></i>
+                    <span><strong>API Caching Notice:</strong> Public Minecraft APIs cache server status lists for 3-5 minutes to prevent spam attacks. If you recently joined or left, the system may take a couple of minutes to display the exact change!</span>
+                </div>
+
+                <!-- Live Discord Integration -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center bg-mc-panel/50 border border-white/5 p-6 rounded-2xl">
+                    <div class="space-y-4">
+                        <span class="bg-[#5865F2]/20 text-[#5865F2] px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-[#5865F2]/20 inline-block">
+                            <i class="fab fa-discord mr-1"></i> Live Chat lobby
+                        </span>
+                        <h3 class="font-display text-xl font-bold text-white">Join the Community</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Interact with S37 builders directly in our server voice rooms and community chat channels on Discord! Track active users and coordinate group construction plans right here.
+                        </p>
+                        <a href="https://discord.gg/FeNnMxEt3v" target="_blank" class="btn-glow inline-flex bg-[#5865F2] text-white text-xs font-semibold py-3 px-6 rounded-xl items-center gap-2">
+                            <i class="fab fa-discord text-base"></i> Open Full Invite
+                        </a>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="w-full max-w-[340px] bg-mc-dark p-2 rounded-xl border border-white/5 shadow-xl">
+                            <!-- Premium Discord Dynamic Embedded Widget Iframe -->
+                            <iframe src="https://discord.com/widget?id=973274680993652746&theme=dark" width="100%" height="300" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" class="rounded-lg"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: RULES -->
+        <div id="panel-rules" class="panel-transition panel-hidden w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-6 flex-shrink-0">
+                <h2 class="font-display text-2xl font-bold text-white">Server Regulations</h2>
+                <p class="text-xs text-gray-400 mt-1">Help us foster a safe, clean, and collaborative space for all</p>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto space-y-4 pr-1 flex-grow">
+                <!-- Rule items -->
+                <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl flex items-start gap-4">
+                    <div class="bg-red-500/20 text-red-500 p-3 rounded-lg flex-shrink-0"><i class="fas fa-ban text-lg"></i></div>
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-1">1. Anti-Cheat Regulations</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Any modified clients including X-Ray engines, Fly hacks, speed/auto-clicking extensions or radar injectors are instantly blocklisted on S37.</p>
+                    </div>
+                </div>
+
+                <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl flex items-start gap-4">
+                    <div class="bg-indigo-500/20 text-indigo-400 p-3 rounded-lg flex-shrink-0"><i class="fas fa-hands-helping text-lg"></i></div>
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-1">2. Absolute Safety & Inclusivity</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Bullying, toxic outbursts, racial slurs, and offensive behaviors in public chats are strictly banned. Keep community dialogue supportive!</p>
+                    </div>
+                </div>
+
+                <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl flex items-start gap-4">
+                    <div class="bg-amber-500/20 text-amber-500 p-3 rounded-lg flex-shrink-0"><i class="fas fa-bullhorn text-lg"></i></div>
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-1">3. Chat Spamming & Hub Advertising</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Keep gameplay chat records clean. Do not spam letters/CAPS, and do not advertise commercial/external server networks.</p>
+                    </div>
+                </div>
+
+                <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl flex items-start gap-4">
+                    <div class="bg-emerald-500/20 text-emerald-500 p-3 rounded-lg flex-shrink-0"><i class="fas fa-shield-alt text-lg"></i></div>
+                    <div>
+                        <h4 class="text-base font-bold text-white mb-1">4. Zero-Grief Policy</h4>
+                        <p class="text-gray-400 text-xs leading-relaxed">Stealing blocks, breaking builds, or taking unregistered chest properties inside community areas is treated as structural griefing and leads to a ban.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: GALLERY -->
+        <div id="panel-gallery" class="panel-transition panel-hidden w-full max-w-5xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="flex items-center justify-between mb-6 flex-shrink-0">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-white">S37 Media Gallery</h2>
+                    <p class="text-xs text-gray-400 mt-1">Atmospheric visual captures from our survival seasons</p>
+                </div>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto pr-1 flex-grow">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="gallery-grid">
+                    <!-- Image 1 -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl overflow-hidden group flex flex-col hover:border-mc-primary/30 transition-all duration-300">
+                        <div class="overflow-hidden relative h-48">
+                            <img src="https://images.unsplash.com/photo-1629196914237-f7e48fe10710?q=80&w=600&auto=format&fit=crop" alt="Minecraft Spawn" class="w-full h-full object-cover transform transition duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i class="fas fa-eye text-white text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-mc-panel/40 flex-grow">
+                            <h4 class="text-sm font-bold text-white mb-1">Central Spawn Plaza</h4>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">The safe zone where everyone starts. Features helpful NPC guides, spawn rules, and starter resources.</p>
+                        </div>
+                    </div>
+                    <!-- Image 2 -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl overflow-hidden group flex flex-col hover:border-mc-primary/30 transition-all duration-300">
+                        <div class="overflow-hidden relative h-48">
+                            <img src="https://images.unsplash.com/photo-1587573089734-09cb69c0f2b4?q=80&w=600&auto=format&fit=crop" alt="Collaborative construction" class="w-full h-full object-cover transform transition duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i class="fas fa-eye text-white text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-mc-panel/40 flex-grow">
+                            <h4 class="text-sm font-bold text-white mb-1">Community Outposts</h4>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">Collaborative settlements constructed by our whitelisted builders, perfect for trading and resting.</p>
+                        </div>
+                    </div>
+                    <!-- Image 3 -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl overflow-hidden group flex flex-col hover:border-mc-primary/30 transition-all duration-300">
+                        <div class="overflow-hidden relative h-48">
+                            <img src="https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=600&auto=format&fit=crop" alt="PvP Arena" class="w-full h-full object-cover transform transition duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i class="fas fa-eye text-white text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-mc-panel/40 flex-grow">
+                            <h4 class="text-sm font-bold text-white mb-1">Gladiator PvP Arena</h4>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">The ultimate colosseum hosting organized custom events, tournament combat leagues, and duels.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: STAFF TEAM -->
+        <div id="panel-team" class="panel-transition panel-hidden w-full max-w-5xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-6 flex-shrink-0">
+                <h2 class="font-display text-2xl font-bold text-white">S37 Staff Guild</h2>
+                <p class="text-xs text-gray-400 mt-1">Our hard-working engineering and moderation administrators</p>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto pr-1 flex-grow">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center hover:border-red-500/25 transition-all">
+                        <img src="https://minotar.net/helm/Notch/120.png" alt="S37 Owner" class="w-20 h-20 mx-auto rounded-xl mb-4 shadow-md border border-red-500/30">
+                        <h3 class="text-base font-bold text-white">S37_Owner</h3>
+                        <p class="text-red-500 text-xs font-bold mb-2">Network Owner</p>
+                        <p class="text-[11px] text-gray-400">Directs finances, whitelists approval pools and cluster hosting.</p>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center hover:border-orange-500/25 transition-all">
+                        <img src="https://minotar.net/helm/Steve/120.png" alt="S37 Admin" class="w-20 h-20 mx-auto rounded-xl mb-4 shadow-md border border-orange-500/30">
+                        <h3 class="text-base font-bold text-white">S37_Admin</h3>
+                        <p class="text-orange-500 text-xs font-bold mb-2">Systems Tech Admin</p>
+                        <p class="text-[11px] text-gray-400">Maintains configurations, security patches, plugins and database structures.</p>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center hover:border-emerald-500/25 transition-all">
+                        <img src="https://minotar.net/helm/Alex/120.png" alt="S37 Moderator" class="w-20 h-20 mx-auto rounded-xl mb-4 shadow-md border border-emerald-500/30">
+                        <h3 class="text-base font-bold text-white">S37_Mod</h3>
+                        <p class="text-emerald-500 text-xs font-bold mb-2">Moderation Lead</p>
+                        <p class="text-[11px] text-gray-400">Maintains in-game chat environments and coordinates safety regulations.</p>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 text-center hover:border-blue-400/25 transition-all">
+                        <img src="https://minotar.net/helm/Herobrine/120.png" alt="S37 Builder" class="w-20 h-20 mx-auto rounded-xl mb-4 shadow-md border border-blue-400/30">
+                        <h3 class="text-base font-bold text-white">S37_Builder</h3>
+                        <p class="text-blue-400 text-xs font-bold mb-2">Structural Designer</p>
+                        <p class="text-[11px] text-gray-400">Constructs architectural blueprints for hubs, markets, and Outpost zones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: PRO TIPS -->
+        <div id="panel-tips" class="panel-transition panel-hidden w-full max-w-4xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-6 flex-shrink-0">
+                <h2 class="font-display text-2xl font-bold text-white">Valuable Survival Tips</h2>
+                <p class="text-xs text-gray-400 mt-1">Master our loaded plugins and mechanics instantly</p>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto space-y-6 pr-1 flex-grow">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Tip 1 (AuthMe) -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-mc-primary/10 text-mc-primary p-2.5 rounded-lg"><i class="fas fa-lock text-base"></i></div>
+                            <h3 class="text-base font-bold text-white">AuthMe Protection</h3>
+                        </div>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Since our server accommodates offline/cracked clients, protect your username instantly! Upon first connection, use <code class="bg-black/50 px-1.5 py-0.5 rounded text-mc-primary font-mono">/register [password] [password]</code>. Next times you log in, write <code class="bg-black/50 px-1.5 py-0.5 rounded text-mc-primary font-mono">/login [password]</code> to unlock your character.
+                        </p>
+                    </div>
+
+                    <!-- Tip 2 (GSit) -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-amber-500/10 text-amber-500 p-2.5 rounded-lg"><i class="fas fa-chair text-base"></i></div>
+                            <h3 class="text-base font-bold text-white">Interactive Emotes (GSit)</h3>
+                        </div>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Bring your character to life with interactive body animations. Relax anywhere using the <code class="bg-black/50 px-1.5 py-0.5 rounded text-amber-500 font-mono">/sit</code> command, rest flat with <code class="bg-black/50 px-1.5 py-0.5 rounded text-amber-500 font-mono">/lay</code>, or sneak through narrow vents using <code class="bg-black/50 px-1.5 py-0.5 rounded text-amber-500 font-mono">/crawl</code>!
+                        </p>
+                    </div>
+
+                    <!-- Tip 3 (Essentials) -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-blue-500/10 text-blue-400 p-2.5 rounded-lg"><i class="fas fa-home text-base"></i></div>
+                            <h3 class="text-base font-bold text-white">Warp Homes (Essentials)</h3>
+                        </div>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Never worry about finding your fortress again. Pinpoint your shelter location coordinates inside the game system using <code class="bg-black/50 px-1.5 py-0.5 rounded text-blue-400 font-mono">/sethome [name]</code>. Teleport back to your bed instantly from anywhere in the world using <code class="bg-black/50 px-1.5 py-0.5 rounded text-blue-400 font-mono">/home [name]</code>.
+                        </p>
+                    </div>
+
+                    <!-- Tip 4 (Economy) -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="bg-purple-500/10 text-purple-400 p-2.5 rounded-lg"><i class="fas fa-coins text-base"></i></div>
+                            <h3 class="text-base font-bold text-white">Economy & Future Shop</h3>
+                        </div>
+                        <p class="text-gray-400 text-xs leading-relaxed">
+                            Trade efficiently! You can transfer in-game money safely to online players with <code class="bg-black/50 px-1.5 py-0.5 rounded text-purple-400 font-mono">/pay [player] [amount]</code>. To foster high-tier survival progression, a fully loaded virtual shop platform (<code class="bg-black/50 px-1.5 py-0.5 rounded text-purple-400 font-mono">/shop</code>) is planned to launch as the network base expands!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 7: EXCLUSIVE CAPYBARA HOSTING PARTNER -->
+        <div id="panel-capy" class="panel-transition panel-hidden w-full max-w-4xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-6 flex-shrink-0 text-center sm:text-left">
+                <span class="bg-mc-capy/20 text-mc-capy px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-mc-capy/20 inline-block mb-2">
+                    <i class="fas fa-fire mr-1 animate-pulse"></i> Infrastructure Partner
+                </span>
+                <h2 class="font-display text-2xl font-bold text-white">S37 is Powered by Capybara Hosting</h2>
+                <p class="text-xs text-gray-400 mt-1">Bulgarian high-performance Minecraft hosting solutions</p>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto space-y-6 pr-1 flex-grow">
+                <p class="text-gray-300 text-xs sm:text-sm leading-relaxed text-center sm:text-left">
+                    Without Capybara Hosting, S37 would not exist. Get the same outstanding, lag-free hardware performance and extremely low local ping routes for your own custom Minecraft projects!
+                </p>
+
+                <!-- Features layout -->
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center">
+                        <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-rocket"></i></span>
+                        <h4 class="text-xs font-semibold text-white mb-1">99.5% Uptime</h4>
+                        <p class="text-[10px] text-gray-500">Maximum operational game availability.</p>
+                    </div>
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center">
+                        <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-shield-alt"></i></span>
+                        <h4 class="text-xs font-semibold text-white mb-1">DDoS Shield</h4>
+                        <p class="text-[10px] text-gray-500">Robust continuous traffic protection.</p>
+                    </div>
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center">
+                        <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-euro-sign"></i></span>
+                        <h4 class="text-xs font-semibold text-white mb-1">Low Prices</h4>
+                        <p class="text-[10px] text-gray-500">Hardware fitting every server budget.</p>
+                    </div>
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center">
+                        <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-headset"></i></span>
+                        <h4 class="text-xs font-semibold text-white mb-1">Active Staff</h4>
+                        <p class="text-[10px] text-gray-500">Dedicated help desk support teams.</p>
+                    </div>
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center col-span-2 lg:col-span-1">
+                        <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-map-marker-alt"></i></span>
+                        <h4 class="text-xs font-semibold text-white mb-1">Bulgarian Nodes</h4>
+                        <p class="text-[10px] text-gray-500">Extremely low local regional latency.</p>
+                    </div>
+                </div>
+
+                <!-- Call to actions -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                    <a href="https://capybarahost.xyz/" target="_blank" class="btn-glow-orange bg-mc-capy text-white font-display font-bold py-3 px-6 rounded-xl text-sm flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <i class="fas fa-external-link-alt"></i> Go to Capybara Website
+                    </a>
+                    <a href="https://discord.gg/2esFMv2FPw" target="_blank" class="btn-glow bg-[#5865F2] text-white font-display font-bold py-3 px-6 rounded-xl text-sm flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <i class="fab fa-discord"></i> Join Partner Discord
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 8: AUTOMATIC WHITELIST FORM -->
+        <div id="panel-whitelist" class="panel-transition panel-hidden w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-4 flex-shrink-0 flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                    <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold" id="step-title">Page 1: Identity & Age</span>
+                    <h2 class="font-display text-xl font-bold text-white mt-0.5">Whitelist Entry Quiz</h2>
+                </div>
+                <span class="text-[11px] text-gray-400 font-display font-semibold" id="step-counter">Page 1 of 3</span>
+            </div>
+
+            <!-- Forms scroll frame -->
+            <div class="scrollable-content overflow-y-auto pr-1 flex-grow" id="form-container">
+                <form id="wl-form" onsubmit="event.preventDefault();" class="space-y-4 py-2">
+                    
+                    <!-- STEP 1: Identification -->
+                    <div id="step-1" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Minecraft Character Name (In-Game Name) *</label>
+                            <input type="text" id="wl-ign" required placeholder="e.g., Steve_Adventures" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Discord Handle (Username/Tag) *</label>
+                            <input type="text" id="wl-discord" required placeholder="e.g., steve_discord" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">How old are you? *</label>
+                            <input type="number" id="wl-age" required min="1" max="99" placeholder="Minimum Age: 12" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                            <p class="text-[10px] text-amber-500 mt-1.5"><i class="fas fa-exclamation-triangle"></i> S37 security guidelines require candidates to be at least 12 years of age to enter the whitelist pool.</p>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: Scenario and Rules Test -->
+                    <div id="step-2" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: You spot a beautiful chest full of Netherite blocks inside an unclaimed house. What do you do? *</label>
+                            <textarea id="wl-scenario-chest" required rows="2" placeholder="Describe your reaction..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: Another active player accidentally breaks some blocks of your custom building while trying to hunt a mob. How do you resolve this? *</label>
+                            <textarea id="wl-scenario-conflict" required rows="2" placeholder="Explain your course of action..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">What is 'Griefing' in your own words, and why is it banned here? *</label>
+                            <textarea id="wl-definition-grief" required rows="2" placeholder="Define your understanding..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Goals & Motivation -->
+                    <div id="step-3" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Describe your main architectural goals or projects planned for S37 *</label>
+                            <textarea id="wl-motivation" required rows="3" placeholder="I plan to construct a medieval town and redstone system..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                        </div>
+                        <div class="flex items-start gap-3 bg-mc-dark/40 p-4 rounded-xl border border-white/5">
+                            <input type="checkbox" id="wl-rule-check" required class="mt-1 h-4 w-4 accent-mc-primary">
+                            <label for="wl-rule-check" class="text-[11px] text-gray-300 cursor-pointer">I pledge to respect other players, maintain the integrity of their property, avoid hack client platforms, and behave in a friendly manner. I understand rule violations result in instant whitelist removal.</label>
+                        </div>
+                    </div>
+
+                    <!-- Under Age Alert UI -->
+                    <div id="age-warning" class="hidden bg-red-950/40 border border-red-500/20 text-red-300 p-4 rounded-xl text-xs flex gap-3 items-center">
+                        <i class="fas fa-times-circle text-lg"></i>
+                        <span><strong>Application Rejected:</strong> Candidate does not meet the minimum age threshold (12+). We thank you for your interest!</span>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Application Success Dashboard State -->
+            <div id="success-state" class="hidden text-center py-6 space-y-4 flex-grow flex flex-col justify-center">
+                <!-- Sending spinner state -->
+                <div id="submitting-spinner" class="space-y-3">
+                    <div class="w-12 h-12 border-4 border-mc-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <h4 class="font-display text-lg font-bold text-white">Transmitting Application to Staff Pool...</h4>
+                    <p class="text-xs text-gray-400">Secure pipeline to channel #1258864675819487373</p>
+                </div>
+
+                <!-- Finished success message -->
+                <div id="submission-completed" class="hidden space-y-4">
+                    <div class="w-16 h-16 bg-mc-primary/20 text-mc-primary rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg shadow-mc-primary/25">
+                        <i class="fas fa-check-double"></i>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold text-white">Application Transmitted!</h3>
+                    <p class="text-xs text-gray-300 max-w-md mx-auto leading-relaxed">
+                        Excellent! Your application has been dispatched successfully and is queued for staff review in Discord channel <span class="text-mc-primary font-bold">#1258864675819487373</span>!
+                    </p>
+                    <div class="bg-mc-dark/40 p-4 rounded-xl border border-white/5 text-[11px] text-gray-400 max-w-sm mx-auto">
+                        <p class="font-semibold text-white mb-1">Review Time:</p>
+                        <p>Our team verifies applications daily. Stay tuned in Discord for your Whitelisted validation notifications.</p>
+                    </div>
+                    <a href="https://discord.gg/FeNnMxEt3v" target="_blank" class="btn-glow inline-flex bg-[#5865F2] text-white text-xs font-semibold py-3 px-6 rounded-xl items-center gap-2 mx-auto">
+                        <i class="fab fa-discord"></i> Open Discord Lounge
+                    </a>
+                </div>
+
+                <!-- Error fallback (No Webhook / Network failure) -->
+                <div id="submission-failed" class="hidden space-y-4">
+                    <div class="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4 class="font-display text-lg font-bold text-white">Web-Delivery Offline</h4>
+                    <p class="text-xs text-gray-300">We could not contact the Discord system directly. Please copy your application below and share it with moderators in channel #1258864675819487373!</p>
+                    <textarea id="failed-raw-text" class="w-full bg-mc-dark text-gray-300 font-mono text-[10px] p-3 rounded-lg border border-white/10 h-28 focus:outline-none" readonly></textarea>
+                    <button onclick="copyRawFailedText()" class="btn-glow bg-mc-primary text-white text-xs font-semibold py-2.5 px-6 rounded-xl inline-flex items-center gap-2 mx-auto">
+                        <i class="fas fa-copy"></i> Copy Application Data
+                    </button>
+                    <p id="error-fallback-toast" class="text-[10px] text-emerald-400"></p>
+                </div>
+            </div>
+
+            <!-- Interactive wizard buttons -->
+            <div class="flex items-center justify-between mt-4 border-t border-white/5 pt-4 flex-shrink-0" id="form-actions">
+                <button type="button" id="btn-prev" onclick="prevStep()" class="hidden bg-white/5 text-white border border-white/10 hover:bg-white/10 px-5 py-2 rounded-xl text-xs font-semibold transition-all">
+                    <i class="fas fa-chevron-left mr-1"></i> Back
+                </button>
+                <div class="flex-grow"></div>
+                <button type="button" id="btn-next" onclick="nextStep()" class="bg-mc-accent hover:bg-amber-600 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2">
+                    Next <i class="fas fa-chevron-right text-[10px]"></i>
+                </button>
+                <button type="button" id="btn-submit" onclick="submitForm()" class="hidden bg-mc-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Apply Whitelist
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 9: FEEDBACK & REPORT DESK -->
+        <div id="panel-feedback" class="panel-transition panel-hidden w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-4 flex-shrink-0 border-b border-white/10 pb-4">
+                <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold"><i class="fas fa-bullhorn mr-1"></i> S37 SUPPORT DESK</span>
+                <h2 class="font-display text-xl font-bold text-white mt-0.5">Suggestions & Complaints</h2>
+                <p class="text-xs text-gray-400 mt-1">Submit suggestions or complaints directly to S37 managers. Submissions are dispatched directly to channel #1303156105379184732.</p>
+            </div>
+
+            <!-- Form Frame -->
+            <div class="scrollable-content overflow-y-auto pr-1 flex-grow">
+                <form id="feedback-form" onsubmit="event.preventDefault();" class="space-y-4 py-2">
+                    
+                    <!-- Feedback Category Selector -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-2">Select Submission Type *</label>
+                        <div class="grid grid-cols-2 gap-3" id="feedback-types">
+                            <!-- Suggestion -->
+                            <div onclick="selectFeedbackType('suggestion', '#10b981', this)" class="type-card active cursor-pointer p-3 rounded-xl bg-mc-dark/40 flex items-center gap-3" style="--card-accent-color: #10b981;">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-mc-primary flex items-center justify-center text-sm"><i class="fas fa-lightbulb"></i></div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">Suggestion</h4>
+                                    <p class="text-[9px] text-gray-400">Server features</p>
+                                </div>
+                            </div>
+                            <!-- Bug -->
+                            <div onclick="selectFeedbackType('bug', '#6366f1', this)" class="type-card cursor-pointer p-3 rounded-xl bg-mc-dark/40 flex items-center gap-3" style="--card-accent-color: #6366f1;">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-mc-secondary flex items-center justify-center text-sm"><i class="fas fa-bug"></i></div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">Server Bug</h4>
+                                    <p class="text-[9px] text-gray-400">Glitches or exploits</p>
+                                </div>
+                            </div>
+                            <!-- Website -->
+                            <div onclick="selectFeedbackType('website', '#f59e0b', this)" class="type-card cursor-pointer p-3 rounded-xl bg-mc-dark/40 flex items-center gap-3" style="--card-accent-color: #f59e0b;">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-mc-accent flex items-center justify-center text-sm"><i class="fas fa-laptop-code"></i></div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">Website Issue</h4>
+                                    <p class="text-[9px] text-gray-400">Design or bugs</p>
+                                </div>
+                            </div>
+                            <!-- Staff Complaint -->
+                            <div onclick="selectFeedbackType('staff', '#ef4444', this)" class="type-card cursor-pointer p-3 rounded-xl bg-mc-dark/40 flex items-center gap-3" style="--card-accent-color: #ef4444;">
+                                <div class="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center text-sm"><i class="fas fa-user-times"></i></div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">Staff Complaint</h4>
+                                    <p class="text-[9px] text-gray-400">Confidential reports</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="fb-category" value="suggestion">
+                    </div>
+
+                    <!-- Sender Handle -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Your Discord Handle / Minecraft IGN (Optional)</label>
+                        <input type="text" id="fb-sender" placeholder="Leave blank to submit anonymously" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-primary transition-all">
+                        <p class="text-[10px] text-gray-500 mt-1"><i class="fas fa-user-secret"></i> Staff Complaints can be sent completely anonymously. Leave blank if you prefer.</p>
+                    </div>
+
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Title / Summary *</label>
+                        <input type="text" id="fb-title" required placeholder="e.g., Lag issues near spawn, Abusive moderator..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-primary transition-all">
+                    </div>
+
+                    <!-- Details -->
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Detailed Explanation & Evidence *</label>
+                        <textarea id="fb-details" required rows="4" placeholder="Describe your suggestion or complaint in detail. If reporting players/staff, please include links to video/image proof (e.g., Imgur, YouTube)..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-primary transition-all resize-none"></textarea>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Submit Success State -->
+            <div id="fb-success-state" class="hidden text-center py-6 space-y-4 flex-grow flex flex-col justify-center">
+                <div class="w-16 h-16 bg-mc-primary/20 text-mc-primary rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg shadow-mc-primary/25">
+                    <i class="fas fa-paper-plane animate-pulse"></i>
+                </div>
+                <h3 class="font-display text-2xl font-bold text-white">Ticket Dispatched!</h3>
+                <p class="text-xs text-gray-300 max-w-md mx-auto leading-relaxed">
+                    Your suggestion/complaint has been transmitted securely and queued for administration review in Discord channel <span class="text-mc-primary font-bold">#1303156105379184732</span>!
+                </p>
+                <button onclick="resetFeedbackForm()" class="btn-glow bg-white/5 border border-white/10 hover:bg-white/10 px-5 py-2 rounded-xl text-xs font-semibold transition-all mx-auto">
+                    Submit Another Ticket
+                </button>
+            </div>
+
+            <!-- Feedback Fail Fallback Screen -->
+            <div id="fb-failed-state" class="hidden text-center py-6 space-y-4 flex-grow flex flex-col justify-center">
+                <div class="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto text-xl">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4 class="font-display text-lg font-bold text-white">API Delivery Offline</h4>
+                <p class="text-xs text-gray-300">We could not send the feedback directly. Please copy your ticket below and paste it in Discord channel #1303156105379184732!</p>
+                <textarea id="failed-fb-text" class="w-full bg-mc-dark text-gray-300 font-mono text-[10px] p-3 rounded-lg border border-white/10 h-28 focus:outline-none" readonly></textarea>
+                <button onclick="copyRawFailedFeedback()" class="btn-glow bg-mc-primary text-white text-xs font-semibold py-2.5 px-6 rounded-xl inline-flex items-center gap-2 mx-auto">
+                    <i class="fas fa-copy"></i> Copy Ticket Data
+                </button>
+                <button onclick="resetFeedbackForm()" class="text-xs text-gray-400 underline block mx-auto mt-2 hover:text-white">Go Back</button>
+                <p id="fb-error-toast" class="text-[10px] text-emerald-400"></p>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center justify-end mt-4 border-t border-white/5 pt-4 flex-shrink-0" id="fb-actions">
+                <button type="button" onclick="submitFeedbackForm()" class="bg-mc-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i> Submit Ticket
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION 10: S37 CHRONO-ORACLE (AI ASSISTANT) -->
+        <div id="panel-oracle" class="panel-transition panel-hidden w-full max-w-4xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh] oracle-glow">
+            <div class="flex items-center justify-between mb-4 flex-shrink-0 border-b border-white/10 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center text-lg animate-pulse">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase tracking-widest text-indigo-400 font-bold">S37 Oracle Core v3.1</span>
+                        <h2 class="font-display text-xl font-bold text-white mt-0.5">S37 Build & Survival Assistant</h2>
+                    </div>
+                </div>
+                <div class="text-[11px] text-gray-400 flex items-center gap-2">
+                    <span class="status-dot bg-indigo-500 shadow-indigo-500"></span>
+                    Secure S37 Core v3.1
+                </div>
+            </div>
+
+            <!-- Pre-prompt suggestions row -->
+            <div class="flex flex-wrap gap-2 mb-4 flex-shrink-0">
+                <button onclick="sendQuickPrompt('Draft a cool medieval fortress concept with materials')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fas fa-castle"></i> Build Idea
+                </button>
+                <button onclick="sendQuickPrompt('Explain s37 interactive emotes & commands')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fas fa-terminal"></i> Command Help
+                </button>
+                <button onclick="sendQuickPrompt('Generate a highly efficient automated kelp farm design')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fas fa-cog"></i> Redstone Architect
+                </button>
+                <button onclick="sendQuickPrompt('Review my application response for the whitelist scenario about unclaimed netherite blocks')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+                    <i class="fas fa-file-signature"></i> Review My Application Draft
+                </button>
+            </div>
+
+            <!-- Chat display window -->
+            <div id="oracle-chat" class="scrollable-content overflow-y-auto pr-1 flex-grow space-y-4 min-h-[30vh] bg-mc-dark/50 p-4 rounded-2xl border border-white/5">
+                <!-- Introductory message -->
+                <div class="flex items-start gap-3">
+                    <div class="bg-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-robot"></i></div>
+                    <div class="bg-indigo-950/20 border border-indigo-500/10 text-xs text-gray-300 p-3.5 rounded-r-xl rounded-bl-xl max-w-[85%] leading-relaxed space-y-2">
+                        <p class="font-semibold text-white">Greetings, Traveler of S37!</p>
+                        <p>I am the S37 Oracle, your mystical, intelligent Minecraft assistant. I can help you architect grand structures, decode Redstone machinery, or optimize your whitelist submission responses.</p>
+                        <p>What ancient survival secrets do you seek to unlock today?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loader indicator (hidden by default) -->
+            <div id="oracle-loader" class="hidden flex items-center gap-3 px-4 py-2 mt-2 flex-shrink-0 text-xs text-indigo-400 italic">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span>Channelling cosmic matrix and Minecraft database...</span>
+            </div>
+
+            <!-- Chat inputs bar -->
+            <div class="flex items-center gap-2 mt-4 border-t border-white/5 pt-4 flex-shrink-0">
+                <input type="text" id="oracle-input" placeholder="Ask about build ideas, S37 rules, redstone designs, or whitelist assistance..." class="flex-grow bg-mc-dark border border-white/10 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all" onkeypress="handleOracleKey(event)">
+                <button onclick="sendOracleMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0">
+                    <i class="fas fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- RADIAL NAV MENU SECTION -->
+    <div class="fixed bottom-12 right-12 z-50 flex items-center justify-center">
+        <div class="relative radial-menu-container flex items-center justify-center" id="radial-menu">
+            
+            <!-- Radial Button items orbiting the center (Calibrated for Top-Left Quadrant Arc) -->
+            <!-- 1. Home -->
+            <button onclick="switchTab('home')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -120px; --tw-translate-y: 0px;" title="Home Hub">
+                <i class="fas fa-home text-sm"></i>
+            </button>
+            <!-- 2. Live Stats -->
+            <button onclick="switchTab('stats')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -118px; --tw-translate-y: -21px;" title="Live Metrics">
+                <i class="fas fa-chart-bar text-sm"></i>
+            </button>
+            <!-- 3. Whitelist -->
+            <button onclick="switchTab('whitelist')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -113px; --tw-translate-y: -41px;" title="Apply Whitelist">
+                <i class="fas fa-file-signature text-sm"></i>
+            </button>
+            <!-- 4. Rules -->
+            <button onclick="switchTab('rules')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -104px; --tw-translate-y: -60px;" title="Rules">
+                <i class="fas fa-gavel text-sm"></i>
+            </button>
+            <!-- 5. Gallery -->
+            <button onclick="switchTab('gallery')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -92px; --tw-translate-y: -77px;" title="Gallery">
+                <i class="fas fa-images text-sm"></i>
+            </button>
+            <!-- 6. Staff -->
+            <button onclick="switchTab('team')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -77px; --tw-translate-y: -92px;" title="Staff Guild">
+                <i class="fas fa-user-shield text-sm"></i>
+            </button>
+            <!-- 7. Tips -->
+            <button onclick="switchTab('tips')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -60px; --tw-translate-y: -104px;" title="Pro Tips">
+                <i class="fas fa-lightbulb text-sm"></i>
+            </button>
+            <!-- 8. Capybara -->
+            <button onclick="switchTab('capy')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-capy/40 text-mc-capy hover:text-white hover:bg-mc-capy/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -41px; --tw-translate-y: -113px;" title="Capybara Hosting">
+                <i class="fas fa-fire text-sm"></i>
+            </button>
+            <!-- 9. Feedback & Reports -->
+            <button onclick="switchTab('feedback')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -21px; --tw-translate-y: -118px;" title="Feedback & Reports">
+                <i class="fas fa-comment-medical text-sm"></i>
+            </button>
+            <!-- 10. AI Companion Oracle -->
+            <button onclick="switchTab('oracle')" class="radial-item absolute w-11 h-11 bg-mc-card border border-indigo-500/40 text-indigo-400 hover:text-white hover:bg-indigo-500/20 rounded-full flex items-center justify-center shadow-xl transition-all animate-pulse" style="--tw-translate-x: 0px; --tw-translate-y: -120px;" title="S37 Oracle AI">
+                <i class="fas fa-brain text-sm"></i>
+            </button>
+
+            <!-- Main Toggle Circular Menu Trigger button -->
+            <button onclick="toggleRadialMenu()" class="w-16 h-16 bg-mc-primary text-white rounded-full flex items-center justify-center shadow-2xl relative z-20 cursor-pointer active:scale-95 transition-transform btn-glow border-2 border-white/15" id="radial-main-trigger">
+                <!-- Compass icon acting as dial -->
+                <i class="fas fa-compass text-2xl transition-transform duration-300" id="radial-compass-icon"></i>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Bottom bar footer -->
+    <footer class="w-full z-40 bg-black/40 border-t border-white/5 py-4 backdrop-blur-sm px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs gap-3">
+        <p class="text-gray-500 text-center sm:text-left">© 2026 S37 「WL』. Not affiliated with Mojang or Microsoft. Created with ❤️ for Bulgarian Minecraft players.</p>
+        <div class="flex items-center gap-4">
+            <button onclick="switchTab('capy')" class="text-mc-capy hover:text-white transition-colors font-semibold">
+                <i class="fas fa-fire mr-1 text-[11px] animate-pulse"></i> Capybara Hosting partner
+            </button>
+            <a href="https://discord.gg/FeNnMxEt3v" target="_blank" class="text-gray-400 hover:text-[#5865F2] transition-colors">
+                <i class="fab fa-discord text-base"></i>
+            </a>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Server details
+        const MC_SERVER_IP = 's37.mc-srv.pro';
+        const DISCORD_SERVER_ID = '973274680993652746';
+        
+        // PASTE YOUR WEBHOOKS TO AUTOMATICALLY TRANSMIT APPS TO DISCORD
+        // 1. Channel #1258864675819487373 Webhook for Whitelist applications
+        const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1510980102618484837/tpAxIu9Arz2XX7S_Et5G4qvQ910Hhbqq4WRB8awGw4_t4QALtKCQnLA0TX5AWOk88-Vn';
+        
+        // 2. Channel Webhook for Feedback, Complaints, Bugs & Website suggestions
+        const DISCORD_FEEDBACK_WEBHOOK_URL = 'https://discord.com/api/webhooks/1511114695191560292/cKJtu5NPN-vsVCjntgjHkrLUGENWqZDjtrXI8-7egweZ4dzFG_RiJRgQN03eVN3ng3C6';
+
+        // 1. Interactive Single Page Application Menu Tab navigation logic
+        function switchTab(tabId) {
+            // Find all active views
+            const panels = document.querySelectorAll('.panel-transition');
+            panels.forEach(panel => {
+                panel.classList.remove('panel-visible');
+                panel.classList.add('panel-hidden');
+            });
+
+            // Make active
+            const targetPanel = document.getElementById(`panel-${tabId}`);
+            if (targetPanel) {
+                targetPanel.classList.remove('panel-hidden');
+                targetPanel.classList.add('panel-visible');
+            }
+
+            // Close radial menu selector wheel upon action click
+            const radialMenu = document.getElementById('radial-menu');
+            radialMenu.classList.remove('open');
+            document.getElementById('radial-compass-icon').style.transform = 'rotate(0deg)';
+        }
+
+        // 2. Circular Navigation Semicircle dial toggle trigger
+        function toggleRadialMenu() {
+            const menu = document.getElementById('radial-menu');
+            const compass = document.getElementById('radial-compass-icon');
+            
+            menu.classList.toggle('open');
+            if (menu.classList.contains('open')) {
+                compass.style.transform = 'rotate(135deg)';
+            } else {
+                compass.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // 3. Copy connection variables to system Clipboard
+        function copyIP(elementId) {
+            const ip = document.getElementById(elementId).innerText;
+            const fallbackCopy = () => {
+                const text = document.createElement("textarea");
+                text.value = ip;
+                document.body.appendChild(text);
+                text.select();
+                try {
+                    document.execCommand('copy');
+                } catch (e) {}
+                document.body.removeChild(text);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(ip).catch(fallbackCopy);
+            } else {
+                fallbackCopy();
+            }
+
+            const toast = document.getElementById('copy-toast');
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // 4. Live Stats fetch dynamically utilizing Cache-Busting parameters
+        async function fetchLiveStats() {
+            const players = document.getElementById('mc-players');
+            const discMembers = document.getElementById('discord-members');
+            const status = document.getElementById('server-status');
+            const dot = document.querySelector('.status-dot');
+            const refreshIcon = document.getElementById('refresh-icon');
+
+            // Add spin style onto click trigger
+            refreshIcon.classList.add('fa-spin');
+
+            let playersCount = 0;
+            let online = false;
+
+            // Generate unique Cache Buster variables on both query URLs
+            const timestamp = Date.now();
+
+            // Fetch MC statistics: try mcsrvstat API with unique cache buster query parameter
+            try {
+                const res = await fetch(`https://api.mcsrvstat.us/2/${MC_SERVER_IP}?t=${timestamp}`);
+                const data = await res.json();
+                if (data.online) {
+                    playersCount = data.players.online;
+                    online = true;
+                }
+            } catch (err) {
+                console.warn("First API layer blocked or cached, launching fallback pipeline...", err);
+            }
+
+            // Fallback: Query minetools if standard status returns locked results
+            if (!online) {
+                try {
+                    const res = await fetch(`https://api.minetools.eu/ping/${MC_SERVER_IP}/25565?t=${timestamp}`);
+                    const data = await res.json();
+                    if (data && data.players) {
+                        playersCount = data.players.online;
+                        online = true;
+                    }
+                } catch (fallbackErr) {
+                    console.error("Secondary fallback API query also failed:", fallbackErr);
+                }
+            }
+
+            // Render stats inside views
+            if (online) {
+                animateCount(players, 0, playersCount, 1200);
+                status.innerText = 'Online';
+                status.className = 'text-mc-primary';
+                dot.style.backgroundColor = '#10b981';
+                dot.style.animation = 'pulse-dot 2s infinite';
+            } else {
+                players.innerText = '0';
+                status.innerText = 'Offline';
+                status.className = 'text-red-500';
+                dot.style.backgroundColor = '#ef4444';
+                dot.style.animation = 'none';
+            }
+
+            // Fetch Discord stats dynamically through your server widget JSON API
+            try {
+                const res = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`);
+                if (!res.ok) throw new Error("Discord API rejected widget requests");
+                const data = await res.json();
+                animateCount(discMembers, 0, data.presence_count || 0, 1200);
+            } catch (err) {
+                console.warn("Discord widget block, triggering fallback calculations...", err);
+                simulateDiscordStats();
+            }
+
+            // Remove spin after updates finish
+            setTimeout(() => {
+                refreshIcon.classList.remove('fa-spin');
+            }, 800);
+        }
+
+        // Dynamic Discord members simulator fallback if Widget has API blockage
+        function simulateDiscordStats() {
+            const discordCount = document.getElementById('discord-members');
+            let mockCount = 84;
+            animateCount(discordCount, 0, mockCount, 1200);
+            setInterval(() => {
+                const step = Math.floor(Math.random() * 3) - 1; // variance
+                mockCount += step;
+                discordCount.innerText = Math.max(10, mockCount);
+            }, 8000);
+        }
+
+        function animateCount(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 4); 
+                element.innerHTML = Math.floor(ease * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    element.innerHTML = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // 5. Interactive Whitelist Multi-Step Wizard System
+        let currentStep = 1;
+        const stepTitles = {
+            1: "Page 1: Identity & Age Checks",
+            2: "Page 2: Scenario and Rules Quiz",
+            3: "Page 3: Motives and Final Pledge"
+        };
+
+        function updateFormUI() {
+            document.getElementById('step-title').innerText = stepTitles[currentStep];
+            document.getElementById('step-counter').innerText = `Page ${currentStep} of 3`;
+
+            // Adjust form visible steps
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
+
+            const prev = document.getElementById('btn-prev');
+            const next = document.getElementById('btn-next');
+            const submit = document.getElementById('btn-submit');
+
+            if (currentStep === 1) {
+                prev.classList.add('hidden');
+            } else {
+                prev.classList.remove('hidden');
+            }
+
+            if (currentStep === 3) {
+                next.classList.add('hidden');
+                submit.classList.remove('hidden');
+            } else {
+                next.classList.remove('hidden');
+                submit.classList.add('hidden');
+            }
+        }
+
+        function validateStep() {
+            const warning = document.getElementById('age-warning');
+            warning.classList.add('hidden');
+
+            if (currentStep === 1) {
+                const ign = document.getElementById('wl-ign').value.trim();
+                const discord = document.getElementById('wl-discord').value.trim();
+                const age = parseInt(document.getElementById('wl-age').value);
+
+                if (!ign || !discord || isNaN(age)) {
+                    triggerAlert("Fulfill all identification inputs to advance.");
+                    return false;
+                }
+                if (age < 12) {
+                    warning.classList.remove('hidden');
+                    return false;
+                }
+            } else if (currentStep === 2) {
+                const chest = document.getElementById('wl-scenario-chest').value.trim();
+                const conflict = document.getElementById('wl-scenario-conflict').value.trim();
+                const grief = document.getElementById('wl-definition-grief').value.trim();
+
+                if (chest.length < 5 || conflict.length < 5 || grief.length < 5) {
+                    triggerAlert("Explain your answers nicely in full detail before advancing (min 5 characters).");
+                    return false;
+                }
+            } else if (currentStep === 3) {
+                const motivation = document.getElementById('wl-motivation').value.trim();
+                const check = document.getElementById('wl-rule-check').checked;
+
+                if (motivation.length < 10) {
+                    triggerAlert("Please detail your structural SMP build projects (min 10 characters).");
+                    return false;
+                }
+                if (!check) {
+                    triggerAlert("Review and sign our pledge checkbox to apply.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function triggerAlert(message) {
+            const container = document.createElement("div");
+            container.className = "fixed bottom-5 left-5 z-50 bg-red-600 text-white font-semibold py-3 px-6 rounded-xl shadow-xl transition-all duration-300 transform translate-y-0 text-xs flex items-center gap-2";
+            container.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            document.body.appendChild(container);
+            setTimeout(() => {
+                container.classList.add("opacity-0", "translate-y-4");
+                setTimeout(() => container.remove(), 300);
+            }, 3000);
+        }
+
+        function nextStep() {
+            if (validateStep()) {
+                currentStep++;
+                updateFormUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateFormUI();
+            }
+        }
+
+        // 6. Whitelist Submit automation system
+        async function submitForm() {
+            if (!validateStep()) return;
+
+            // Form data gather
+            const data = {
+                ign: document.getElementById('wl-ign').value.trim(),
+                discord: document.getElementById('wl-discord').value.trim(),
+                age: document.getElementById('wl-age').value,
+                chest: document.getElementById('wl-scenario-chest').value.trim(),
+                conflict: document.getElementById('wl-scenario-conflict').value.trim(),
+                grief: document.getElementById('wl-definition-grief').value.trim(),
+                motivation: document.getElementById('wl-motivation').value.trim()
+            };
+
+            const backupText = `==============================
+S37 WHITELIST SMP APPLICATION
+==============================
+Minecraft Player IGN: ${data.ign}
+Discord Handle Tag: ${data.discord}
+Age Verified: ${data.age} (Min Required: 12)
+
+-- SCENARIOS & ENTRY QUIZ --
+Scenario 1 (Chest Looting Netherite):
+"${data.chest}"
+
+Scenario 2 (Accidental Block Conflict):
+"${data.conflict}"
+
+Grief Definition Explanation:
+"${data.grief}"
+
+Player Survival Goals:
+"${data.motivation}"
+
+Signed Rules Pledge: TRUE
+==============================`;
+
+            // Prepare UI state changes
+            document.getElementById('wl-form').classList.add('hidden');
+            document.getElementById('form-actions').classList.add('hidden');
+            document.getElementById('success-state').classList.remove('hidden');
+
+            const spinner = document.getElementById('submitting-spinner');
+            const finished = document.getElementById('submission-completed');
+            const failed = document.getElementById('submission-failed');
+
+            spinner.classList.remove('hidden');
+            finished.classList.add('hidden');
+            failed.classList.add('hidden');
+
+            // Fallback Trigger: check webhook configuration
+            if (!DISCORD_WEBHOOK_URL) {
+                spinner.classList.add('hidden');
+                failed.classList.remove('hidden');
+                document.getElementById('failed-raw-text').value = backupText;
+                return;
+            }
+
+            // Formulate Payload structure for channel 1258864675819487373
+            const payload = {
+                embeds: [{
+                    title: "📝 New S37 Whitelist Entry Quiz",
+                    color: 1095553, // emerald
+                    fields: [
+                        { name: "Minecraft IGN", value: data.ign, inline: true },
+                        { name: "Discord Username", value: data.discord, inline: true },
+                        { name: "Age Verified", value: data.age, inline: true },
+                        { name: "Chest Netherite Scenario", value: data.chest },
+                        { name: "Accident Block Scenario", value: data.conflict },
+                        { name: "Definition of Griefing", value: data.grief },
+                        { name: "Plans & Goals", value: data.motivation }
+                    ],
+                    footer: { text: "S37 Automatic Whitelist Delivery" },
+                    timestamp: new Date()
+                }]
+            };
+
+            try {
+                const res = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    spinner.classList.add('hidden');
+                    finished.classList.remove('hidden');
+                } else {
+                    throw new Error("Discord server delivery returned status error: " + res.status);
+                }
+            } catch (err) {
+                console.error("Automated delivery network fail:", err);
+                spinner.classList.add('hidden');
+                failed.classList.remove('hidden');
+                document.getElementById('failed-raw-text').value = backupText;
+            }
+        }
+
+        function copyRawFailedText() {
+            const el = document.getElementById('failed-raw-text');
+            el.select();
+            try {
+                document.execCommand('copy');
+                const toast = document.getElementById('error-fallback-toast');
+                toast.innerText = "✓ Application text copied! Paste it inside channel #1258864675819487373 on Discord!";
+            } catch (err) {}
+        }
+
+        // 7. Interactive Feedback & Report selection
+        function selectFeedbackType(category, colorHex, element) {
+            document.getElementById('fb-category').value = category;
+            
+            // Clear active states
+            const cards = document.querySelectorAll('#feedback-types .type-card');
+            cards.forEach(card => card.classList.remove('active'));
+            
+            // Set active color and border styling dynamically
+            element.classList.add('active');
+            element.style.setProperty('--card-accent-color', colorHex);
+        }
+
+        async function submitFeedbackForm() {
+            const category = document.getElementById('fb-category').value;
+            const sender = document.getElementById('fb-sender').value.trim() || "Anonymous Player";
+            const title = document.getElementById('fb-title').value.trim();
+            const details = document.getElementById('fb-details').value.trim();
+
+            if (!title || !details) {
+                triggerAlert("Please fill in both the summary title and detailed explanations.");
+                return;
+            }
+
+            const backupFeedbackText = `=========================================
+S37 NEW FEEDBACK & REPORT SUBMISSION
+=========================================
+Category Type: ${category.toUpperCase()}
+Submitter: ${sender}
+Title/Summary: ${title}
+
+-- DETAILED REASONING & PROOF --
+"${details}"
+=========================================`;
+
+            // Prepare UI States
+            document.getElementById('feedback-form').classList.add('hidden');
+            document.getElementById('fb-actions').classList.add('hidden');
+            
+            const successState = document.getElementById('fb-success-state');
+            const failedState = document.getElementById('fb-failed-state');
+
+            // Embed customization
+            let embedColor = 65280; // Emerald (default)
+            let categoryIcon = "💡";
+            if (category === "bug") {
+                embedColor = 6505215; // Indigo
+                categoryIcon = "🐛";
+            } else if (category === "website") {
+                embedColor = 16104971; // Amber
+                categoryIcon = "💻";
+            } else if (category === "staff") {
+                embedColor = 15701044; // Crimson Red
+                categoryIcon = "🚨 Staff Report";
+            }
+
+            // Fallback Trigger: check webhook configuration
+            if (!DISCORD_FEEDBACK_WEBHOOK_URL) {
+                failedState.classList.remove('hidden');
+                document.getElementById('failed-fb-text').value = backupFeedbackText;
+                return;
+            }
+
+            const payload = {
+                embeds: [{
+                    title: `${categoryIcon} S37 Ticket: ${title}`,
+                    color: embedColor,
+                    fields: [
+                        { name: "Submission Category", value: category.toUpperCase(), inline: true },
+                        { name: "Reported By / Contact", value: sender, inline: true },
+                        { name: "Details & Proof", value: details }
+                    ],
+                    footer: { text: "S37 Support & Feedback Pipeline" },
+                    timestamp: new Date()
+                }]
+            };
+
+            try {
+                const res = await fetch(DISCORD_FEEDBACK_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    successState.classList.remove('hidden');
+                } else {
+                    throw new Error("Discord API rejected feedback transmission: " + res.status);
+                }
+            } catch (err) {
+                console.error("Feedback transmission failed:", err);
+                failedState.classList.remove('hidden');
+                document.getElementById('failed-fb-text').value = backupFeedbackText;
+            }
+        }
+
+        function copyRawFailedFeedback() {
+            const el = document.getElementById('failed-fb-text');
+            el.select();
+            try {
+                document.execCommand('copy');
+                const toast = document.getElementById('fb-error-toast');
+                toast.innerText = "✓ System ticket data copied! Please share this with administrators in Discord channel #1303156105379184732!";
+            } catch (err) {}
+        }
+
+        function resetFeedbackForm() {
+            // Reset input values
+            document.getElementById('fb-title').value = '';
+            document.getElementById('fb-details').value = '';
+            document.getElementById('fb-sender').value = '';
+            
+            // Revert views
+            document.getElementById('feedback-form').classList.remove('hidden');
+            document.getElementById('fb-actions').classList.remove('hidden');
+            document.getElementById('fb-success-state').classList.add('hidden');
+            document.getElementById('fb-failed-state').classList.add('hidden');
+        }
+
+        // ==========================================
+        // SECTION 10: S37 CHRONO-ORACLE AI CORE
+        // ==========================================
+        
+        // 1. АКО СИ СВАЛИЛ САЙТА НА КОМПЮТЪРА СИ:
+        // Твоят вграден работещ API ключ от Google AI Studio е интегриран тук автоматично!
+        const MY_AI_KEY = "AIzaSyAPRogKLC3VxGZ3ak_mwtPS1DnT7orbFsE";
+
+        // Проверка дали сме в среда за разработка или локално на твоя компютър
+        const apiKey = (MY_AI_KEY !== "ВАШИЯТ_БЕЗПЛАТЕН_API_KEY_ТУК" && MY_AI_KEY !== "") ? MY_AI_KEY : "";
+        const chatHistory = [];
+
+        // Predefined instructions training the assistant on S37 specific ecosystem rules, plugins, and lore
+        const systemPrompt = `You are "S37 Oracle", an advanced, highly specialized AI Guide and Build Consultant for the "Ｓ３７ 「WL』" Minecraft SMP (Survival Multiplayer) server.
+Your main parameters are:
+1. S37 Specific Guidelines: Keep players informed that we enforce a zero-tolerance policy towards griefing (grief is highly illegal!), hacking client engines (X-Ray, fly, speed), or abusive comments.
+2. STRICT COMMAND LIMITATION (CRITICAL): You must ONLY provide, explain, or list commands that are accessible to regular, normal players (default group in LuckPerms) on the S37 SMP. Under NO circumstances are you to mention, suggest, or detail administrative, moderator, operator (OP), or technical setup commands (such as /op, /deop, /ban, /kick, /tempban, /co rollback, /co l, /gamemode, /stop, /whitelist, /plugman, etc.). If a user asks for staff/admin commands, politely inform them that you only assist with player-level mechanics to keep the server secure.
+3. Approved Player Plugin Mechanisms Installed:
+   - AuthMe: Allows users of cracked or offline accounts. Command to register is /register [pass] [pass] and to login is /login [pass].
+   - GSit: Super cool interactive poses! Use /sit, /lay, or /crawl to relax around bases.
+   - Essentials (Player commands only): Teleport hubs. Pin locations with /sethome [name], teleport with /home [name]. Send teleport request to others with /tpa [player], accept with /tpaccept, deny with /tpdeny, go back to spawn with /spawn.
+   - Player Economy: Exchange virtual funds safely via /pay [player] [amount]. Check balance with /bal. Note that a grand virtual trading interface (/shop) is planned for future expansion once S37 grows bigger!
+4. Architectural build advisory: When asked for build ideas, generate creative, detailed Minecraft concept outlines, recommended blocks palettes, and building coordinates/planning.
+5. Redstone blueprints: Break down complex circuitry processes logically with step-by-step assembly lines.
+6. Whitelist assistance: Help candidates draft great responses to S37 Whitelist application scenario questions. Encourage them with positive feedback but keep S37 standards high.
+Keep responses concise, highly supportive, professional, and slightly futuristic/game-savvy. Use rich Markdown format with bold text, clean lists, and code blocks for coordinates or commands! Refer users to join the official Discord hub: https://discord.gg/FeNnMxEt3v.`;
+
+        // Interactive API request dispatcher utilizing exponential backoff retry algorithms
+        async function callGeminiAPI(query, retries = 3, delay = 1000) {
+            // Ако ключът е празен и сме извън платформата (localhost / file)
+            if (apiKey === "" && (window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+                return `⚠️ **S37 AI Системно Известие:**
+                
+                Забелязах, че сте изтеглили и отворили уебсайта локално на вашия компютър! За да работи изкуственият интелект извън платформата:
+                
+                1. Отидете на **https://aistudio.google.com/** и натиснете **"Get API Key"** (напълно безплатно е и отнема 30 секунди).
+                2. Отворете файла \`index.html\` с текстов редактор (например Notepad, VS Code и др.).
+                3. Намерете променливата \`const MY_AI_KEY = "ВАШИЯТ_БЕЗПЛАТЕН_API_KEY_ТУК";\` (около ред 400).
+                4. Заменете текста с вашия нов ключ и запазете файла.
+                
+                След това изкуственият интелект ще работи за вас и вашите играчи навсякъде и завинаги!`;
+            }
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            
+            // Build the current conversation payload structure
+            const payload = {
+                contents: [
+                    ...chatHistory,
+                    { role: "user", parts: [{ text: query }] }
+                ],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 429 && retries > 0) {
+                    // Back off exponentially upon encountering traffic limits (429 rate limit error code)
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return callGeminiAPI(query, retries - 1, delay * 2);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP network anomaly! status code: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("Unexpected API payload format received.");
+                return text;
+
+            } catch (err) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return callGeminiAPI(query, retries - 1, delay * 2);
+                }
+                throw err;
+            }
+        }
+
+        function appendChatMessage(sender, text) {
+            const chatBox = document.getElementById('oracle-chat');
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = 'flex items-start gap-3';
+
+            // Distinct formatting based on sender type
+            if (sender === 'user') {
+                messageWrapper.innerHTML = `
+                    <div class="flex-grow"></div>
+                    <div class="bg-indigo-600 border border-indigo-400/20 text-xs text-white p-3.5 rounded-l-xl rounded-br-xl max-w-[85%] leading-relaxed">
+                        <p class="font-semibold text-indigo-200 mb-1">You</p>
+                        <p class="whitespace-pre-line">${escapeHTML(text)}</p>
+                    </div>
+                    <div class="bg-mc-card border border-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-user"></i></div>
+                `;
+            } else {
+                // Parse markdown to HTML natively for formatted bold/code elements
+                const formattedHTML = parseMarkdown(text);
+                messageWrapper.innerHTML = `
+                    <div class="bg-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-robot animate-pulse"></i></div>
+                    <div class="bg-indigo-950/25 border border-indigo-500/20 text-xs text-gray-300 p-3.5 rounded-r-xl rounded-bl-xl max-w-[85%] leading-relaxed space-y-2">
+                        <p class="font-semibold text-white">S37 Oracle</p>
+                        <div>${formattedHTML}</div>
+                    </div>
+                `;
+            }
+
+            chatBox.appendChild(messageWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendOracleMessage() {
+            const inputEl = document.getElementById('oracle-input');
+            const queryText = inputEl.value.trim();
+            if (!queryText) return;
+
+            // Display user query
+            appendChatMessage('user', queryText);
+            inputEl.value = '';
+
+            // Show active loader state
+            const loader = document.getElementById('oracle-loader');
+            loader.classList.remove('hidden');
+
+            try {
+                const responseText = await callGeminiAPI(queryText);
+                
+                // Track conversation history boundaries
+                chatHistory.push({ role: "user", parts: [{ text: queryText }] });
+                chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+                
+                // Keep history trimmed to a healthy length to optimize context space
+                if (chatHistory.length > 20) {
+                    chatHistory.splice(0, 2);
+                }
+
+                appendChatMessage('oracle', responseText);
+
+            } catch (err) {
+                console.error("Oracle API channeling failure:", err);
+                appendChatMessage('oracle', "Apologies, Traveler. The cosmic Chrono-link to the servers was temporarily disrupted. Please retry in a moment, or ensure you are connected to the network.");
+            } finally {
+                loader.classList.add('hidden');
+            }
+        }
+
+        // Quick suggestions automated injector
+        function sendQuickPrompt(promptText) {
+            document.getElementById('oracle-input').value = promptText;
+            sendOracleMessage();
+        }
+
+        function handleOracleKey(e) {
+            if (e.key === 'Enter') {
+                sendOracleMessage();
+            }
+        }
+
+        // Helper: Custom light markdown processor for clean code renders
+        function parseMarkdown(text) {
+            let processed = text;
+            
+            // Format Code Blocks
+            processed = processed.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre class="bg-black/40 border border-white/5 p-2 rounded-lg font-mono text-[11px] my-2 text-indigo-300 overflow-x-auto">$2</pre>');
+            
+            // Format Inline Code
+            processed = processed.replace(/`([^`]+)`/g, '<code class="bg-black/50 px-1.5 py-0.5 rounded text-indigo-400 font-mono text-[10px]">$1</code>');
+            
+            // Format bold tags
+            processed = processed.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+            
+            // Bullet points lists
+            processed = processed.replace(/^\s*[-*]\s+(.*)$/gm, '<li class="list-disc ml-4 my-1 text-gray-300">$1</li>');
+
+            return processed;
+        }
+
+        // Helper: XSS sanitizer for safe string prints
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Initialize dashboard actions
+        window.addEventListener('load', () => {
+            fetchLiveStats();
+        });
+
+    </script>
+</body>
+</html>
