@@ -137,15 +137,23 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* Radial Menu transitions */
+        /* Radial Menu Transitions and Scaled Layout Coordinates */
         .radial-item {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform: scale(0) translate(0, 0);
             pointer-events: none;
             opacity: 0;
+            --radius-scale: 1;
         }
+        
+        @media (max-width: 768px) {
+            .radial-item {
+                --radius-scale: 0.75;
+            }
+        }
+
         .radial-menu-container.open .radial-item {
-            transform: scale(1) translate(var(--tw-translate-x), var(--tw-translate-y));
+            transform: scale(1) translate(calc(var(--orbit-x) * var(--radius-scale)), calc(var(--orbit-y) * var(--radius-scale)));
             pointer-events: auto;
             opacity: 1;
         }
@@ -184,26 +192,50 @@
         .oracle-glow {
             box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.3);
         }
+        
+        /* Interactive Rating Stars */
+        .rating-star {
+            font-size: 2rem;
+            color: #4b5563;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.1s ease;
+        }
+        .rating-star:hover {
+            transform: scale(1.15);
+        }
+        .rating-star.selected, .rating-star.hovered {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
     </style>
 </head>
 <body class="antialiased hero-bg flex flex-col justify-between h-screen overflow-hidden">
 
     <!-- Top Brand Header -->
-    <header class="w-full z-40 px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center bg-gradient-to-b from-black/60 to-transparent">
+    <header class="w-full z-40 px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-3 bg-gradient-to-b from-black/60 to-transparent">
         <div class="flex items-center gap-3">
-            <div class="font-display text-xl sm:text-2xl font-bold tracking-wider text-white">
+            <div class="font-display text-xl sm:text-2xl font-bold tracking-wider text-white cursor-pointer" onclick="switchTab('home')">
                 <span class="text-mc-primary">Ｓ３７</span> 「WL』
             </div>
             <span class="text-xs bg-mc-primary/20 text-mc-primary px-2.5 py-0.5 rounded-full border border-mc-primary/30 hidden sm:inline-block">Vanilla+ SMP</span>
         </div>
         
-        <!-- Server Active Status HUD -->
-        <div class="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-sm text-xs">
-            <span class="status-dot"></span>
-            <span class="text-gray-400">Server IP:</span>
-            <span class="font-mono text-white font-semibold select-all" id="hud-ip">s37.mc-srv.pro</span>
-            <button onclick="copyIP('hud-ip')" class="text-mc-primary hover:text-white transition-colors ml-1" title="Copy Server Address">
-                <i class="fas fa-copy"></i>
+        <!-- Server Active Status HUD & Profile -->
+        <div class="flex items-center gap-3">
+            <!-- HUD -->
+            <div class="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-white/5 backdrop-blur-sm text-xs">
+                <span class="status-dot"></span>
+                <span class="text-gray-400">IP:</span>
+                <span class="font-mono text-white font-semibold select-all" id="hud-ip">s37.mc-srv.pro</span>
+                <button onclick="copyIP('hud-ip')" class="text-mc-primary hover:text-white transition-colors ml-1" title="Copy Server Address">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+
+            <!-- Profile Widget Button -->
+            <button onclick="switchTab('account')" class="flex items-center gap-2 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 px-4 py-2 rounded-xl text-xs font-semibold text-indigo-300 transition-all shadow-md" id="profile-hud-btn">
+                <i class="fas fa-user-circle text-sm"></i>
+                <span id="profile-hud-text">Account</span>
             </button>
         </div>
     </header>
@@ -305,7 +337,7 @@
                     </div>
                     <div class="flex justify-center">
                         <div class="w-full max-w-[340px] bg-mc-dark p-2 rounded-xl border border-white/5 shadow-xl">
-                            <!-- Premium Discord Dynamic Embedded Widget Iframe -->
+                            <!-- Premium Discord Embedded Widget Iframe -->
                             <iframe src="https://discord.com/widget?id=973274680993652746&theme=dark" width="100%" height="300" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" class="rounded-lg"></iframe>
                         </div>
                     </div>
@@ -540,7 +572,7 @@
                     </div>
                     <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center">
                         <span class="text-mc-capy text-xl mb-2 block"><i class="fas fa-headset"></i></span>
-                        <h4 class="text-xs font-semibold text-white mb-1">Active Staff</h4>
+                        <h4 class="text-xs font-semibold text-white mb-1">Active Support</h4>
                         <p class="text-[10px] text-gray-500">Dedicated help desk support teams.</p>
                     </div>
                     <div class="bg-mc-dark/40 border border-white/5 rounded-xl p-4 text-center col-span-2 lg:col-span-1">
@@ -562,12 +594,12 @@
             </div>
         </div>
 
-        <!-- SECTION 8: AUTOMATIC WHITELIST FORM -->
+        <!-- SECTION 8: AUTOMATIC WHITELIST & STAFF APPLICATION FORM -->
         <div id="panel-whitelist" class="panel-transition panel-hidden w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
             <div class="mb-4 flex-shrink-0 flex items-center justify-between border-b border-white/10 pb-4">
                 <div>
-                    <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold" id="step-title">Page 1: Identity & Age</span>
-                    <h2 class="font-display text-xl font-bold text-white mt-0.5">Whitelist Entry Quiz</h2>
+                    <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold" id="step-title">Page 1: Choose Application Type</span>
+                    <h2 class="font-display text-xl font-bold text-white mt-0.5">S37 Candidate Quiz</h2>
                 </div>
                 <span class="text-[11px] text-gray-400 font-display font-semibold" id="step-counter">Page 1 of 3</span>
             </div>
@@ -576,8 +608,16 @@
             <div class="scrollable-content overflow-y-auto pr-1 flex-grow" id="form-container">
                 <form id="wl-form" onsubmit="event.preventDefault();" class="space-y-4 py-2">
                     
-                    <!-- STEP 1: Identification -->
+                    <!-- STEP 1: Identification & App Choice -->
                     <div id="step-1" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Select Application Category *</label>
+                            <select id="wl-type" onchange="handleAppTypeChange()" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all cursor-pointer">
+                                <option value="whitelist" selected>Standard Whitelist (Survival SMP - Min Age: 12)</option>
+                                <option value="creator">Content Creator / Streamer (Twitch/YT/TikTok - Min Age: 12)</option>
+                                <option value="staff">Staff Application (Helper & Mod Team - Min Age: 15)</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-300 mb-1.5">Minecraft Character Name (In-Game Name) *</label>
                             <input type="text" id="wl-ign" required placeholder="e.g., Steve_Adventures" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
@@ -588,31 +628,68 @@
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-300 mb-1.5">How old are you? *</label>
-                            <input type="number" id="wl-age" required min="1" max="99" placeholder="Minimum Age: 12" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
-                            <p class="text-[10px] text-amber-500 mt-1.5"><i class="fas fa-exclamation-triangle"></i> S37 security guidelines require candidates to be at least 12 years of age to enter the whitelist pool.</p>
+                            <input type="number" id="wl-age" required min="1" max="99" placeholder="E.g., 16" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                            <p class="text-[10px] text-amber-500 mt-1.5" id="wl-age-notice">
+                                <i class="fas fa-exclamation-triangle"></i> S37 security guidelines require candidates to be at least 12 years of age to enter the whitelist pool.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- STEP 2: Scenario and Rules Test -->
+                    <!-- STEP 2: Scenario and Rules Test (DYNAMIC) -->
                     <div id="step-2" class="space-y-4 hidden">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: You spot a beautiful chest full of Netherite blocks inside an unclaimed house. What do you do? *</label>
-                            <textarea id="wl-scenario-chest" required rows="2" placeholder="Describe your reaction..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                        <!-- Standard Whitelist Questions -->
+                        <div id="q-whitelist" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: You spot a beautiful chest full of Netherite blocks inside an unclaimed house. What do you do? *</label>
+                                <textarea id="wl-scenario-chest" rows="2" placeholder="Describe your reaction..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: Another active player accidentally breaks some blocks of your custom building while trying to hunt a mob. How do you resolve this? *</label>
+                                <textarea id="wl-scenario-conflict" rows="2" placeholder="Explain your course of action..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">What is 'Griefing' in your own words, and why is it banned here? *</label>
+                                <textarea id="wl-definition-grief" rows="2" placeholder="Define your understanding..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: Another active player accidentally breaks some blocks of your custom building while trying to hunt a mob. How do you resolve this? *</label>
-                            <textarea id="wl-scenario-conflict" required rows="2" placeholder="Explain your course of action..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+
+                        <!-- Content Creator Questions -->
+                        <div id="q-creator" class="space-y-4 hidden">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Link to your Primary Channel (YouTube, Twitch, TikTok, etc.) *</label>
+                                <input type="url" id="wl-creator-link" placeholder="e.g., https://twitch.tv/my_channel" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2.5 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">What type of Minecraft content do you stream or film? *</label>
+                                <textarea id="wl-creator-style" rows="2" placeholder="e.g., Let's plays, building tutorials, speedruns..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">How would you promote S37 to your audience? *</label>
+                                <textarea id="wl-creator-promo" rows="2" placeholder="e.g., Include server IP in descriptions, host live streams, play with viewers..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">What is 'Griefing' in your own words, and why is it banned here? *</label>
-                            <textarea id="wl-definition-grief" required rows="2" placeholder="Define your understanding..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+
+                        <!-- Staff Application Questions -->
+                        <div id="q-staff" class="space-y-4 hidden">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">What prior moderation or administrative experience do you have? *</label>
+                                <textarea id="wl-staff-exp" rows="2" placeholder="Detail any Discord or Minecraft servers you previously managed..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Scenario: Two players are heavily arguing and spamming insults in public chat. What commands or actions do you use? *</label>
+                                <textarea id="wl-staff-scenario" rows="2" placeholder="E.g., Mute/Warn procedures using default plugin formats..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1.5">Why should we choose you over other candidates to help coordinate S37? *</label>
+                                <textarea id="wl-staff-motive" rows="2" placeholder="Explain your reliable schedule, soft skills, and dedication..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
+                            </div>
                         </div>
                     </div>
 
                     <!-- STEP 3: Goals & Motivation -->
                     <div id="step-3" class="space-y-4 hidden">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Describe your main architectural goals or projects planned for S37 *</label>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1.5">Describe your main goals or projects planned on S37 *</label>
                             <textarea id="wl-motivation" required rows="3" placeholder="I plan to construct a medieval town and redstone system..." class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-4 text-xs text-white focus:outline-none focus:border-mc-accent transition-all resize-none"></textarea>
                         </div>
                         <div class="flex items-start gap-3 bg-mc-dark/40 p-4 rounded-xl border border-white/5">
@@ -624,7 +701,7 @@
                     <!-- Under Age Alert UI -->
                     <div id="age-warning" class="hidden bg-red-950/40 border border-red-500/20 text-red-300 p-4 rounded-xl text-xs flex gap-3 items-center">
                         <i class="fas fa-times-circle text-lg"></i>
-                        <span><strong>Application Rejected:</strong> Candidate does not meet the minimum age threshold (12+). We thank you for your interest!</span>
+                        <span id="age-warning-text"><strong>Application Rejected:</strong> Candidate does not meet the minimum age threshold (12+). We thank you for your interest!</span>
                     </div>
 
                 </form>
@@ -687,16 +764,29 @@
             </div>
         </div>
 
-        <!-- SECTION 9: FEEDBACK & REPORT DESK -->
-        <div id="panel-feedback" class="panel-transition panel-hidden w-full max-w-2xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+        <!-- SECTION 9: FEEDBACK, RATING & COMPLAINTS DESK -->
+        <div id="panel-feedback" class="panel-transition panel-hidden w-full max-w-3xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
             <div class="mb-4 flex-shrink-0 border-b border-white/10 pb-4">
-                <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold"><i class="fas fa-bullhorn mr-1"></i> S37 SUPPORT DESK</span>
-                <h2 class="font-display text-xl font-bold text-white mt-0.5">Suggestions & Complaints</h2>
-                <p class="text-xs text-gray-400 mt-1">Submit suggestions or complaints directly to S37 managers. Submissions are dispatched directly to channel #1303156105379184732.</p>
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <span class="text-[10px] uppercase tracking-widest text-mc-accent font-bold"><i class="fas fa-bullhorn mr-1"></i> S37 SUPPORT DESK</span>
+                        <h2 class="font-display text-xl font-bold text-white mt-0.5">Support & Ratings Portal</h2>
+                    </div>
+                    <!-- Rating / Complaint Tabs -->
+                    <div class="flex gap-1.5 bg-black/40 p-1 rounded-xl border border-white/5">
+                        <button onclick="switchFeedbackSubTab('tab-ticket')" id="subbtn-ticket" class="bg-mc-primary text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all">
+                            <i class="fas fa-envelope mr-1"></i> Support Ticket
+                        </button>
+                        <button onclick="switchFeedbackSubTab('tab-rating')" id="subbtn-rating" class="text-gray-400 hover:text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all">
+                            <i class="fas fa-star mr-1"></i> Rate Site
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- Form Frame -->
-            <div class="scrollable-content overflow-y-auto pr-1 flex-grow">
+            <!-- Subtab 1: Support tickets -->
+            <div id="feedback-subtab-ticket" class="scrollable-content overflow-y-auto pr-1 flex-grow space-y-4">
+                <p class="text-xs text-gray-400 mb-2">Submit suggestions or complaints directly to S37 managers. Submissions are dispatched directly to channel #1303156105379184732.</p>
                 <form id="feedback-form" onsubmit="event.preventDefault();" class="space-y-4 py-2">
                     
                     <!-- Feedback Category Selector -->
@@ -761,6 +851,66 @@
                 </form>
             </div>
 
+            <!-- Subtab 2: S37 Star Rating -->
+            <div id="feedback-subtab-rating" class="scrollable-content overflow-y-auto pr-1 flex-grow space-y-4 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <!-- Left Column: Rating Form -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-5 rounded-2xl space-y-4">
+                        <h3 class="font-display text-sm font-bold text-white">Leave your review</h3>
+                        
+                        <!-- Star Picker UI -->
+                        <div class="flex items-center gap-2 justify-center py-2 bg-black/20 rounded-xl">
+                            <span onclick="setRatingStars(1)" onmouseover="hoverRatingStars(1)" onmouseout="resetRatingStars()" class="rating-star" data-index="1"><i class="fas fa-star"></i></span>
+                            <span onclick="setRatingStars(2)" onmouseover="hoverRatingStars(2)" onmouseout="resetRatingStars()" class="rating-star" data-index="2"><i class="fas fa-star"></i></span>
+                            <span onclick="setRatingStars(3)" onmouseover="hoverRatingStars(3)" onmouseout="resetRatingStars()" class="rating-star" data-index="3"><i class="fas fa-star"></i></span>
+                            <span onclick="setRatingStars(4)" onmouseover="hoverRatingStars(4)" onmouseout="resetRatingStars()" class="rating-star" data-index="4"><i class="fas fa-star"></i></span>
+                            <span onclick="setRatingStars(5)" onmouseover="hoverRatingStars(5)" onmouseout="resetRatingStars()" class="rating-star" data-index="5"><i class="fas fa-star"></i></span>
+                        </div>
+                        <input type="hidden" id="rating-value" value="0">
+
+                        <div>
+                            <label class="block text-[11px] text-gray-400 font-semibold mb-1">Your Name / Minecraft IGN *</label>
+                            <input type="text" id="rating-author" placeholder="e.g., Notch" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] text-gray-400 font-semibold mb-1">Review Comment *</label>
+                            <textarea id="rating-comment" rows="3" placeholder="S37 has the best vanilla community ever!" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500 resize-none"></textarea>
+                        </div>
+
+                        <button onclick="submitSiteRating()" class="w-full btn-glow bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs py-2.5 rounded-xl transition-all shadow-md">
+                            Submit rating to Discord
+                        </button>
+                    </div>
+
+                    <!-- Right Column: Live stats and reviews feed -->
+                    <div class="space-y-4">
+                        <div class="bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent border border-amber-500/20 rounded-2xl p-4 text-center md:text-left">
+                            <h4 class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">S37 Community Rating</h4>
+                            <div class="flex items-center justify-center md:justify-start gap-3 mt-1.5">
+                                <span class="text-4xl font-display font-extrabold text-white" id="avg-rating-value">0.0</span>
+                                <div>
+                                    <div class="flex text-amber-400 text-xs gap-0.5" id="avg-rating-stars">
+                                        <i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 mt-1" id="total-ratings-count">Based on 0 ratings</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Reviews list -->
+                        <div class="space-y-2">
+                            <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <i class="fas fa-comments text-amber-400"></i> Latest Reviews
+                            </h4>
+                            <div class="space-y-2 max-h-[200px] overflow-y-auto scrollable-content pr-1" id="public-reviews-feed">
+                                <p class="text-xs text-gray-500 italic text-center py-4">No reviews recorded yet. Be the first!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Submit Success State -->
             <div id="fb-success-state" class="hidden text-center py-6 space-y-4 flex-grow flex flex-col justify-center">
                 <div class="w-16 h-16 bg-mc-primary/20 text-mc-primary rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg shadow-mc-primary/25">
@@ -792,13 +942,13 @@
 
             <!-- Action buttons -->
             <div class="flex items-center justify-end mt-4 border-t border-white/5 pt-4 flex-shrink-0" id="fb-actions">
-                <button type="button" onclick="submitFeedbackForm()" class="bg-mc-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2">
+                <button id="fb-submit-action-btn" type="button" onclick="submitFeedbackForm()" class="bg-mc-primary hover:bg-emerald-600 text-white px-6 py-2 rounded-xl text-xs font-semibold transition-all inline-flex items-center gap-2">
                     <i class="fas fa-paper-plane"></i> Submit Ticket
                 </button>
             </div>
         </div>
 
-        <!-- SECTION 10: S37 CHRONO-ORACLE (AI ASSISTANT) -->
+        <!-- SECTION 10: S37 ORACLE CORE (AI ASSISTANT) WITH IMAGE ANALYSIS -->
         <div id="panel-oracle" class="panel-transition panel-hidden w-full max-w-4xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh] oracle-glow">
             <div class="flex items-center justify-between mb-4 flex-shrink-0 border-b border-white/10 pb-4">
                 <div class="flex items-center gap-3">
@@ -812,7 +962,7 @@
                 </div>
                 <div class="text-[11px] text-gray-400 flex items-center gap-2">
                     <span class="status-dot bg-indigo-500 shadow-indigo-500"></span>
-                    Secure S37 Core v3.1
+                    Vision Mode Enabled
                 </div>
             </div>
 
@@ -827,9 +977,6 @@
                 <button onclick="sendQuickPrompt('Generate a highly efficient automated kelp farm design')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
                     <i class="fas fa-cog"></i> Redstone Architect
                 </button>
-                <button onclick="sendQuickPrompt('Review my application response for the whitelist scenario about unclaimed netherite blocks')" class="bg-mc-dark/40 hover:bg-indigo-950/30 border border-white/5 hover:border-indigo-500/30 text-gray-300 hover:text-indigo-300 text-[11px] px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
-                    <i class="fas fa-file-signature"></i> Review My Application Draft
-                </button>
             </div>
 
             <!-- Chat display window -->
@@ -838,74 +985,436 @@
                 <div class="flex items-start gap-3">
                     <div class="bg-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-robot"></i></div>
                     <div class="bg-indigo-950/20 border border-indigo-500/10 text-xs text-gray-300 p-3.5 rounded-r-xl rounded-bl-xl max-w-[85%] leading-relaxed space-y-2">
-                        <p class="font-semibold text-white">Greetings, Traveler of S37!</p>
-                        <p>I am the S37 Oracle, your mystical, intelligent Minecraft assistant. I can help you architect grand structures, decode Redstone machinery, or optimize your whitelist submission responses.</p>
-                        <p>What ancient survival secrets do you seek to unlock today?</p>
+                        <p class="font-semibold text-white">Greetings, Builder of S37!</p>
+                        <p>I am the S37 Oracle. I can help you design epic empires, fix redstone systems, or optimize your whitelist application response.</p>
+                        <p class="text-indigo-400 font-semibold"><i class="fas fa-camera mr-1"></i> S37 Vision Mode is Active!</p>
+                        <p>Have an empty plot of land, a meadow, or a mountain? Click the camera icon below, upload a screenshot, and I will recommend exactly what to construct there, what sizes work best, and which block palettes to select to make it look professional!</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- Inline Image Preview Thumbnail Row -->
+            <div id="oracle-preview-row" class="hidden px-4 py-2 mt-2 flex items-center gap-2 bg-mc-dark border border-indigo-500/20 rounded-xl w-max ml-4 flex-shrink-0">
+                <img id="oracle-preview-img" src="" class="w-10 h-10 object-cover rounded-lg border border-white/10">
+                <span class="text-[10px] text-gray-400" id="oracle-preview-name">Image selected</span>
+                <button onclick="clearSelectedOracleImage()" class="text-red-400 hover:text-red-300 p-1 text-xs"><i class="fas fa-times-circle"></i></button>
             </div>
 
             <!-- Loader indicator (hidden by default) -->
             <div id="oracle-loader" class="hidden flex items-center gap-3 px-4 py-2 mt-2 flex-shrink-0 text-xs text-indigo-400 italic">
                 <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Channelling cosmic matrix and Minecraft database...</span>
+                <span id="loader-status-text">Channelling cosmic matrix and Minecraft database...</span>
             </div>
 
-            <!-- Chat inputs bar -->
+            <!-- Chat inputs bar with Upload Attachment Trigger -->
             <div class="flex items-center gap-2 mt-4 border-t border-white/5 pt-4 flex-shrink-0">
-                <input type="text" id="oracle-input" placeholder="Ask about build ideas, S37 rules, redstone designs, or whitelist assistance..." class="flex-grow bg-mc-dark border border-white/10 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all" onkeypress="handleOracleKey(event)">
+                <input type="file" id="oracle-file-picker" accept="image/*" class="hidden" onchange="handleOracleFileSelect(event)">
+                <button onclick="document.getElementById('oracle-file-picker').click()" class="bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 text-indigo-400 hover:text-white w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0" title="Upload terrain or build screenshot">
+                    <i class="fas fa-camera text-sm"></i>
+                </button>
+                <input type="text" id="oracle-input" placeholder="Ask build ideas, upload terrain screenshots, or review whitelist drafts..." class="flex-grow bg-mc-dark border border-white/10 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all" onkeypress="handleOracleKey(event)">
                 <button onclick="sendOracleMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white w-10 h-10 flex items-center justify-center rounded-xl transition-all flex-shrink-0">
                     <i class="fas fa-paper-plane text-xs"></i>
                 </button>
             </div>
         </div>
 
+        <!-- SECTION 11: COSMETIC & ADMINISTRATIVE S37 SHOP -->
+        <div id="panel-shop" class="panel-transition panel-hidden w-full max-w-5xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="flex items-center justify-between mb-6 flex-shrink-0 border-b border-white/10 pb-4">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-white">S37 Network Exchange Shop</h2>
+                    <p class="text-xs text-gray-400 mt-1">Acquire cosmetic roles, protective configurations, or staff tickets. Non-P2W guaranteed!</p>
+                </div>
+                <span class="bg-emerald-500/10 text-mc-primary border border-mc-primary/20 text-[10px] uppercase font-bold py-1 px-3 rounded-full">
+                    <i class="fas fa-balance-scale mr-1"></i> Balance Checked
+                </span>
+            </div>
+
+            <div class="scrollable-content overflow-y-auto space-y-6 pr-1 flex-grow">
+                <!-- Scent-back Supporting Server Slogan Notice Banner -->
+                <div class="bg-gradient-to-r from-emerald-950/40 via-emerald-900/20 to-transparent border border-mc-primary/30 rounded-2xl p-4 flex items-center gap-4 shadow-lg shadow-emerald-950/20">
+                    <div class="w-12 h-12 bg-mc-primary/20 text-mc-primary rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">100% Core Supporting Promise</h4>
+                        <p class="text-[11px] text-emerald-300 leading-relaxed mt-0.5">
+                            Every single cent received goes directly back into maintaining, hosting, and improving the S37 SMP network! S37 is 100% community-supported and operated.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Core Products Catalog -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <!-- Item 1: Unban Ticket -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-red-500/20 transition-all">
+                        <div class="space-y-2">
+                            <span class="text-red-500 text-2xl"><i class="fas fa-unlock"></i></span>
+                            <h3 class="text-sm font-bold text-white">Unban Ticket</h3>
+                            <p class="text-[11px] text-gray-400">Pardon an active ban. Allows a single whitelisted identity to re-enter the game lobby after infractions.</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-mc-accent text-sm font-bold">€4.99</span>
+                            <button onclick="openPurchaseModal('Unban Ticket', '€4.99')" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">Purchase</button>
+                        </div>
+                    </div>
+
+                    <!-- Item 2: Inventory Restore protection -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-500/20 transition-all">
+                        <div class="space-y-2">
+                            <span class="text-amber-500 text-2xl"><i class="fas fa-briefcase-medical"></i></span>
+                            <h3 class="text-sm font-bold text-white">Item Restore Protection</h3>
+                            <p class="text-[11px] text-gray-400">Inventory restore warranty in the event of accidental lava falls, glitches, or registered technical exploits.</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-mc-accent text-sm font-bold">€2.49</span>
+                            <button onclick="openPurchaseModal('Item Restore Protection', '€2.49')" class="bg-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">Purchase</button>
+                        </div>
+                    </div>
+
+                    <!-- Item 3: Priority Queue Bypass -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/20 transition-all">
+                        <div class="space-y-2">
+                            <span class="text-blue-400 text-2xl"><i class="fas fa-angle-double-right"></i></span>
+                            <h3 class="text-sm font-bold text-white">Priority Login Pass</h3>
+                            <p class="text-[11px] text-gray-400">Priority login slot. Skip connection lines and join the server instantly even when the map node is full.</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-mc-accent text-sm font-bold">€3.99</span>
+                            <button onclick="openPurchaseModal('Priority Login Pass', '€3.99')" class="bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">Purchase</button>
+                        </div>
+                    </div>
+
+                    <!-- Item 4: Builder Event Role -->
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-mc-primary/20 transition-all">
+                        <div class="space-y-2">
+                            <span class="text-mc-primary text-2xl"><i class="fas fa-hammer"></i></span>
+                            <h3 class="text-sm font-bold text-white">Event Builder Role</h3>
+                            <p class="text-[11px] text-gray-400">Construct community build projects and propose structural game events. Assist the admin staff directly.</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                            <span class="text-mc-accent text-sm font-bold">€5.99</span>
+                            <button onclick="openPurchaseModal('Event Builder Role', '€5.99')" class="bg-mc-primary/20 text-mc-primary hover:bg-mc-primary hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">Purchase</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Balance / Non-P2W Aesthetics -->
+                <div class="bg-emerald-950/20 border border-mc-primary/20 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-5">
+                    <div class="bg-mc-primary/10 text-mc-primary rounded-xl p-4 text-3xl"><i class="fas fa-balance-scale"></i></div>
+                    <div class="space-y-1">
+                        <h3 class="text-sm font-bold text-white">Anti-Pay-To-Win Protection Policy</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            We value pure vanilla skills, cooperative building, and equal ground play! The S37 shop offers only administrative safeguards (e.g., restores/unbans) and pure cosmetic/creative permissions. We do not sell netherite items, speed potions, XP boosters, or game exploits.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Cosmetic Products Section -->
+                <div class="space-y-3">
+                    <h3 class="font-display text-base font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-sparkles text-mc-accent"></i> Cosmetic Perks
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Cosmetic 1: Color Titles -->
+                        <div class="bg-mc-dark/40 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Custom Chat Neon Prefix</h4>
+                                <p class="text-[10px] text-gray-400">Stand out with tags like <code class="text-mc-primary">[Warlord]</code> in chat!</p>
+                            </div>
+                            <button onclick="openPurchaseModal('Neon Chat Prefix', '€1.99')" class="bg-white/5 hover:bg-mc-accent text-white px-3 py-1 text-[11px] rounded transition-all">€1.99</button>
+                        </div>
+                        <!-- Cosmetic 2: Particles -->
+                        <div class="bg-mc-dark/40 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Visual Particle Trail</h4>
+                                <p class="text-[10px] text-gray-400">Unlock custom fire or heart loops wrapping your player model.</p>
+                            </div>
+                            <button onclick="openPurchaseModal('Visual Particle Trail', '€1.49')" class="bg-white/5 hover:bg-mc-accent text-white px-3 py-1 text-[11px] rounded transition-all">€1.49</button>
+                        </div>
+                        <!-- Cosmetic 3: Discord VIP Role -->
+                        <div class="bg-mc-dark/40 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Discord VIP Role & Room</h4>
+                                <p class="text-[10px] text-gray-400">Unlock custom Discord roles and safe lounge spaces.</p>
+                            </div>
+                            <button onclick="openPurchaseModal('Discord VIP Status', '€0.99')" class="bg-white/5 hover:bg-mc-accent text-white px-3 py-1 text-[11px] rounded transition-all">€0.99</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 12: USER SYSTEM / PROFILE / ACCOUNT DASHBOARD -->
+        <div id="panel-account" class="panel-transition panel-hidden w-full max-w-4xl glass-panel rounded-3xl p-6 sm:p-8 active-panel-shadow flex flex-col max-h-[75vh]">
+            <div class="mb-6 flex-shrink-0 border-b border-white/10 pb-4 flex items-center justify-between">
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-user-shield text-indigo-400"></i> S37 Core Profile
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">Manage your whitelist applications, feedback tickets, transactions, and synchronized chats</p>
+                </div>
+                <div id="account-status-badge" class="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-3 py-1 rounded-full uppercase font-bold tracking-wider">
+                    Disconnected
+                </div>
+            </div>
+
+            <!-- Scrollable Profile Content -->
+            <div class="scrollable-content overflow-y-auto pr-1 flex-grow space-y-6">
+                
+                <!-- GUEST / AUTH FORMS (Displayed if not logged in) -->
+                <div id="auth-forms-wrapper" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start py-4">
+                    <!-- Column 1: Login Form -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                        <h3 class="font-display text-base font-bold text-white">Sign In to Profile</h3>
+                        <form id="login-form" onsubmit="event.preventDefault();" class="space-y-3">
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">Email Address</label>
+                                <input type="email" id="login-email" placeholder="e.g., steve@domain.com" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">Password</label>
+                                <input type="password" id="login-password" placeholder="••••••••" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            
+                            <div class="pt-2 space-y-2">
+                                <button onclick="handleLoginSubmit()" type="button" class="w-full bg-mc-primary hover:bg-emerald-600 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-md">
+                                    Connect Profile
+                                </button>
+                                
+                                <div class="relative flex py-2 items-center">
+                                    <div class="flex-grow border-t border-white/10"></div>
+                                    <span class="flex-shrink mx-4 text-gray-500 text-[10px] uppercase font-bold tracking-wider">or sign in with</span>
+                                    <div class="flex-grow border-t border-white/10"></div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="handleGoogleSignIn()" type="button" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fab fa-google text-red-500"></i> Google
+                                    </button>
+                                    <button onclick="handleDiscordSignInGuide()" type="button" class="bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/20 text-[#5865F2] text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fab fa-discord"></i> Discord
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Column 2: Register Form -->
+                    <div class="bg-mc-dark/40 border border-white/5 p-6 rounded-2xl space-y-4">
+                        <h3 class="font-display text-base font-bold text-white">Register S37 Identity</h3>
+                        <form id="register-form" onsubmit="event.preventDefault();" class="space-y-3">
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">In-Game Username (IGN) *</label>
+                                <input type="text" id="reg-ign" placeholder="Exact Minecraft username" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">Discord Tag *</label>
+                                <input type="text" id="reg-discord" placeholder="e.g., steve_discord" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">Email Address *</label>
+                                <input type="email" id="reg-email" placeholder="e.g., steve@domain.com" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-gray-400 font-semibold mb-1">Password *</label>
+                                <input type="password" id="reg-password" placeholder="Minimum 6 characters" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-primary">
+                            </div>
+                            
+                            <div class="pt-2 space-y-2">
+                                <button onclick="handleRegisterSubmit()" type="button" class="w-full bg-mc-accent hover:bg-amber-600 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-md">
+                                    Establish Account Identity
+                                </button>
+                                
+                                <div class="relative flex py-2 items-center">
+                                    <div class="flex-grow border-t border-white/10"></div>
+                                    <span class="flex-shrink mx-4 text-gray-500 text-[10px] uppercase font-bold tracking-wider">or connect via</span>
+                                    <div class="flex-grow border-t border-white/10"></div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="handleGoogleSignIn()" type="button" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fab fa-google text-red-500"></i> Google
+                                    </button>
+                                    <button onclick="handleDiscordSignInGuide()" type="button" class="bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/20 text-[#5865F2] text-xs font-semibold py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-2">
+                                        <i class="fab fa-discord"></i> Discord
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- EMAIL VERIFICATION PENDING SCREEN -->
+                <div id="verification-pending-screen" class="hidden text-center py-10 space-y-6 max-w-md mx-auto">
+                    <div class="w-20 h-20 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto text-4xl shadow-lg border border-amber-500/20">
+                        <i class="fas fa-envelope-open-text animate-bounce"></i>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="font-display text-2xl font-bold text-white">Gmail Verification Required</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            We have dispatched a verification link to <span id="verification-target-email" class="text-amber-500 font-bold">your email</span>. Please click the link inside your Gmail inbox to activate your profile identity!
+                        </p>
+                    </div>
+                    <div class="bg-mc-dark/50 p-4 rounded-xl border border-white/5 text-[11px] text-gray-400 text-left space-y-1">
+                        <p class="font-bold text-white"><i class="fas fa-question-circle mr-1"></i> Did not receive the message?</p>
+                        <p>Check your Spam or Promotions folder or click below to request another verification email.</p>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="handleResendVerification()" class="w-full bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2.5 rounded-xl transition-all">
+                            Resend Verification Link
+                        </button>
+                        <button onclick="handleLogout()" class="w-full bg-white/5 hover:bg-white/10 text-gray-300 text-xs py-2 rounded-xl border border-white/10 transition-all">
+                            Return to Login screen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LOGGED-IN PROFILE VIEWS (Displayed if logged in) -->
+                <div id="profile-dashboard-wrapper" class="hidden space-y-6">
+                    <!-- Dynamic template injected here via JavaScript -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SHOP PURCHASE DIALOG / MODAL (SIUMULATED CHECKOUT TICKET OUTFLOW) -->
+        <div id="shop-purchase-modal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 backdrop-blur-md">
+            <div class="w-full max-w-md glass-panel bg-mc-panel p-6 rounded-3xl active-panel-shadow space-y-4">
+                <div class="flex justify-between items-start border-b border-white/10 pb-3">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-white" id="modal-item-name">Confirm Purchase</h3>
+                        <p class="text-xs text-gray-400">Dispatches purchase request ticket directly to staff</p>
+                    </div>
+                    <button onclick="closePurchaseModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times-circle text-lg"></i></button>
+                </div>
+                
+                <div class="space-y-3" id="modal-form-content">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Your Minecraft Character IGN *</label>
+                        <input type="text" id="shop-ign" placeholder="e.g., Steve_Adventures" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Your Discord Username *</label>
+                        <input type="text" id="shop-discord" placeholder="e.g., steve_discord" class="w-full bg-mc-dark border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-mc-accent transition-all">
+                    </div>
+                    <div class="bg-mc-dark/60 p-3 rounded-lg border border-white/5 flex justify-between items-center text-xs">
+                        <span class="text-gray-400">Amount Due:</span>
+                        <span class="text-mc-primary font-bold font-display" id="modal-item-price">€0.00</span>
+                    </div>
+                    <p class="text-[10px] text-gray-500 leading-relaxed">
+                        <i class="fas fa-info-circle"></i> Once submitted, a purchase ticket is transmitted directly to S37 managers in channel #1303156105379184732. A staff coordinator will reach out to you via Discord to complete the transaction secure path.
+                    </p>
+                    <button onclick="dispatchPurchaseTicket()" class="w-full bg-mc-primary hover:bg-emerald-600 text-white font-bold text-xs py-3 px-4 rounded-xl transition-all">
+                        <i class="fas fa-paper-plane mr-1"></i> Submit Purchase Ticket
+                    </button>
+                </div>
+
+                <!-- Purchase feedback screens -->
+                <div id="modal-success-screen" class="hidden text-center py-6 space-y-4">
+                    <div class="w-12 h-12 bg-mc-primary/20 text-mc-primary rounded-full flex items-center justify-center mx-auto text-xl shadow-lg">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 class="font-display text-base font-bold text-white">Purchase Ticket Dispatched!</h4>
+                    <p class="text-xs text-gray-300 max-w-sm mx-auto leading-relaxed">
+                        Thank you! Your ticket for <span class="font-bold text-white" id="success-item-name">Item</span> has been delivered to channel <span class="text-mc-primary font-bold">#1303156105379184732</span>. Please check your Discord inbox for staff coordinates!
+                    </p>
+                    <button onclick="closePurchaseModal()" class="bg-white/5 hover:bg-white/10 text-white text-xs py-2 px-5 rounded-lg border border-white/10 transition-all">Close Window</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: DISCORD SIGN-IN GUIDE -->
+        <div id="discord-signin-modal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4 backdrop-blur-md">
+            <div class="w-full max-w-md glass-panel bg-mc-panel p-6 rounded-3xl active-panel-shadow space-y-4">
+                <div class="flex justify-between items-start border-b border-white/10 pb-3">
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-white">Discord Login Instructions</h3>
+                        <p class="text-xs text-gray-400">OAuth Linking Guide for S37 Portal</p>
+                    </div>
+                    <button onclick="closeDiscordSignInGuide()" class="text-gray-400 hover:text-white"><i class="fas fa-times-circle text-lg"></i></button>
+                </div>
+                
+                <div class="space-y-3 text-xs text-gray-300 leading-relaxed">
+                    <p>
+                        To ensure the safety of our whitelisted databases, Discord direct sign-in is tied directly to our <strong>DiscordSRV</strong> bot structure.
+                    </p>
+                    <div class="bg-mc-dark/60 p-4 rounded-xl border border-white/5 space-y-2">
+                        <p class="font-bold text-white flex items-center gap-1.5"><i class="fas fa-link text-indigo-400"></i> How to link your account:</p>
+                        <ol class="list-decimal pl-4 space-y-1.5 text-[11px] text-gray-400">
+                            <li>Create a standard account on this website using your preferred Email and Password.</li>
+                            <li>Once logged in, open your profile page to find the unique S37 Verification Code.</li>
+                            <li>Join our <a href="https://discord.gg/FeNnMxEt3v" target="_blank" class="text-indigo-400 font-semibold underline">Discord Lounge</a> and paste the code inside the bot registration channel.</li>
+                        </ol>
+                    </div>
+                    <p class="text-[10px] text-gray-500">
+                        * Direct pop-up logging through Discord OAuth is currently queued for S37 Web Release v4.0. Please use Google or Email credentials for immediate dashboard entry!
+                    </p>
+                    <button onclick="closeDiscordSignInGuide()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl transition-all">
+                        Got it, Return
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <!-- RADIAL NAV MENU SECTION -->
+    <!-- RADIAL NAV MENU SECTION (Enlarged w-14 buttons & touch-friendly orbits) -->
     <div class="fixed bottom-12 right-12 z-50 flex items-center justify-center">
         <div class="relative radial-menu-container flex items-center justify-center" id="radial-menu">
             
-            <!-- Radial Button items orbiting the center (Calibrated for Top-Left Quadrant Arc) -->
+            <!-- OUTER RING (Radius: 155px) -->
             <!-- 1. Home -->
-            <button onclick="switchTab('home')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -120px; --tw-translate-y: 0px;" title="Home Hub">
-                <i class="fas fa-home text-sm"></i>
+            <button onclick="switchTab('home')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -155px; --orbit-y: 0px;" title="Home Hub">
+                <i class="fas fa-home text-base sm:text-lg"></i>
             </button>
             <!-- 2. Live Stats -->
-            <button onclick="switchTab('stats')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -118px; --tw-translate-y: -21px;" title="Live Metrics">
-                <i class="fas fa-chart-bar text-sm"></i>
+            <button onclick="switchTab('stats')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -147px; --orbit-y: -48px;" title="Live Metrics">
+                <i class="fas fa-chart-bar text-base sm:text-lg"></i>
             </button>
-            <!-- 3. Whitelist -->
-            <button onclick="switchTab('whitelist')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -113px; --tw-translate-y: -41px;" title="Apply Whitelist">
-                <i class="fas fa-file-signature text-sm"></i>
+            <!-- 3. Shop -->
+            <button onclick="switchTab('stats')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -147px; --orbit-y: -48px;" title="Live Metrics">
+                <i class="fas fa-chart-bar text-base sm:text-lg"></i>
             </button>
-            <!-- 4. Rules -->
-            <button onclick="switchTab('rules')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -104px; --tw-translate-y: -60px;" title="Rules">
-                <i class="fas fa-gavel text-sm"></i>
+            <button onclick="switchTab('shop')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-accent/50 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -125px; --orbit-y: -91px;" title="S37 Store">
+                <i class="fas fa-shopping-cart text-base sm:text-lg"></i>
             </button>
-            <!-- 5. Gallery -->
-            <button onclick="switchTab('gallery')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -92px; --tw-translate-y: -77px;" title="Gallery">
-                <i class="fas fa-images text-sm"></i>
+            <!-- 4. Whitelist -->
+            <button onclick="switchTab('whitelist')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -91px; --orbit-y: -125px;" title="Apply Roles">
+                <i class="fas fa-file-signature text-base sm:text-lg"></i>
             </button>
-            <!-- 6. Staff -->
-            <button onclick="switchTab('team')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -77px; --tw-translate-y: -92px;" title="Staff Guild">
-                <i class="fas fa-user-shield text-sm"></i>
+            <!-- 5. Rules -->
+            <button onclick="switchTab('rules')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -48px; --orbit-y: -147px;" title="Rules">
+                <i class="fas fa-gavel text-base sm:text-lg"></i>
             </button>
-            <!-- 7. Tips -->
-            <button onclick="switchTab('tips')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -60px; --tw-translate-y: -104px;" title="Pro Tips">
-                <i class="fas fa-lightbulb text-sm"></i>
+            <!-- 6. Gallery -->
+            <button onclick="switchTab('gallery')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: 0px; --orbit-y: -155px;" title="Gallery">
+                <i class="fas fa-images text-base sm:text-lg"></i>
             </button>
-            <!-- 8. Capybara -->
-            <button onclick="switchTab('capy')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-capy/40 text-mc-capy hover:text-white hover:bg-mc-capy/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -41px; --tw-translate-y: -113px;" title="Capybara Hosting">
-                <i class="fas fa-fire text-sm"></i>
+
+            <!-- INNER RING (Radius: 95px) -->
+            <!-- 7. Staff -->
+            <button onclick="switchTab('team')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -95px; --orbit-y: 0px;" title="Staff Guild">
+                <i class="fas fa-user-shield text-base sm:text-lg"></i>
             </button>
-            <!-- 9. Feedback & Reports -->
-            <button onclick="switchTab('feedback')" class="radial-item absolute w-11 h-11 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--tw-translate-x: -21px; --tw-translate-y: -118px;" title="Feedback & Reports">
-                <i class="fas fa-comment-medical text-sm"></i>
+            <!-- 8. Tips -->
+            <button onclick="switchTab('tips')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-primary/40 text-mc-primary hover:text-white hover:bg-mc-primary/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -88px; --orbit-y: -36px;" title="Pro Tips">
+                <i class="fas fa-lightbulb text-base sm:text-lg"></i>
             </button>
-            <!-- 10. AI Companion Oracle -->
-            <button onclick="switchTab('oracle')" class="radial-item absolute w-11 h-11 bg-mc-card border border-indigo-500/40 text-indigo-400 hover:text-white hover:bg-indigo-500/20 rounded-full flex items-center justify-center shadow-xl transition-all animate-pulse" style="--tw-translate-x: 0px; --tw-translate-y: -120px;" title="S37 Oracle AI">
-                <i class="fas fa-brain text-sm"></i>
+            <!-- 9. Capy -->
+            <button onclick="switchTab('capy')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-capy/40 text-mc-capy hover:text-white hover:bg-mc-capy/20 rounded-full flex items-center justify-center shadow-xl transition-all" style="--orbit-x: -67px; --orbit-y: -67px;" title="Capybara Hosting">
+                <i class="fas fa-fire text-base sm:text-lg"></i>
+            </button>
+            <!-- 10. Feedback & Reports -->
+            <button onclick="switchTab('feedback')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-mc-accent/40 text-mc-accent hover:text-white hover:bg-mc-accent/20 rounded-full flex items-center justify-center shadow-xl transition-all font-bold" style="--orbit-x: -36px; --orbit-y: -88px;" title="Feedback & Ratings">
+                <i class="fas fa-comment-medical text-base sm:text-lg"></i>
+            </button>
+            <!-- 11. AI Companion Oracle -->
+            <button onclick="switchTab('oracle')" class="radial-item absolute w-12 h-12 sm:w-14 sm:h-14 bg-mc-card border border-indigo-500/40 text-indigo-400 hover:text-white hover:bg-indigo-500/20 rounded-full flex items-center justify-center shadow-xl transition-all animate-pulse" style="--orbit-x: 0px; --orbit-y: -95px;" title="S37 Oracle AI">
+                <i class="fas fa-brain text-base sm:text-lg"></i>
             </button>
 
             <!-- Main Toggle Circular Menu Trigger button -->
@@ -919,7 +1428,7 @@
 
     <!-- Bottom bar footer -->
     <footer class="w-full z-40 bg-black/40 border-t border-white/5 py-4 backdrop-blur-sm px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs gap-3">
-        <p class="text-gray-500 text-center sm:text-left">© 2026 S37 「WL』. Not affiliated with Mojang or Microsoft. Created with ❤️ for Bulgarian Minecraft players.</p>
+        <p class="text-gray-500 text-center sm:text-left">© 2026 S37 「WL』. Not affiliated with Mojang or Microsoft. Powered by Capybara Hosting.</p>
         <div class="flex items-center gap-4">
             <button onclick="switchTab('capy')" class="text-mc-capy hover:text-white transition-colors font-semibold">
                 <i class="fas fa-fire mr-1 text-[11px] animate-pulse"></i> Capybara Hosting partner
@@ -931,54 +1440,141 @@
     </footer>
 
     <!-- SCRIPTS -->
-    <script>
-        // Server details
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut, 
+            updateProfile,
+            GoogleAuthProvider,
+            signInWithPopup,
+            sendEmailVerification
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            collection, 
+            getDocs,
+            addDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase configuration
+        const appId = 's37-minecraft-smp-v3';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyVuhuVjtJDiKUIkQ1aFe-n-IAl52GVkY",
+            authDomain: "s37wl-3ac3a.firebaseapp.com",
+            projectId: "s37wl-3ac3a",
+            storageBucket: "s37wl-3ac3a.firebasestorage.app",
+            messagingSenderId: "45265563902",
+            appId: "1:45265563902:web:16fb164359e88fe466b5af",
+            measurementId: "G-2594FS4EBV"
+        };
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Core App Constants
         const MC_SERVER_IP = 's37.mc-srv.pro';
         const DISCORD_SERVER_ID = '973274680993652746';
-        
-        // PASTE YOUR WEBHOOKS TO AUTOMATICALLY TRANSMIT APPS TO DISCORD
-        // 1. Channel #1258864675819487373 Webhook for Whitelist applications
         const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1510980102618484837/tpAxIu9Arz2XX7S_Et5G4qvQ910Hhbqq4WRB8awGw4_t4QALtKCQnLA0TX5AWOk88-Vn';
-        
-        // 2. Channel Webhook for Feedback, Complaints, Bugs & Website suggestions
         const DISCORD_FEEDBACK_WEBHOOK_URL = 'https://discord.com/api/webhooks/1511114695191560292/cKJtu5NPN-vsVCjntgjHkrLUGENWqZDjtrXI8-7egweZ4dzFG_RiJRgQN03eVN3ng3C6';
+        
+        // ДИСКОРД КАНАЛ С ОЦЕНКИ / РЕЙТИНГ (Webhook линк за оценки):
+        const DISCORD_RATING_WEBHOOK_URL = 'https://discord.com/api/webhooks/1511114695191560292/cKJtu5NPN-vsVCjntgjHkrLUGENWqZDjtrXI8-7egweZ4dzFG_RiJRgQN03eVN3ng3C6';
 
-        // 1. Interactive Single Page Application Menu Tab navigation logic
-        function switchTab(tabId) {
-            // Find all active views
-            const panels = document.querySelectorAll('.panel-transition');
+        // Local state
+        let chatHistory = [];
+        let selectedShopItem = "";
+        let selectedShopPrice = "";
+        let selectedImageBase64 = null;
+        let selectedImageMimeType = null;
+        let selectedImageName = "";
+        let activeRatingVal = 0;
+
+        // S37 ORACLE KEY
+        const MY_AI_KEY = "AIzaSyAPRogKLC3VxGZ3ak_mwtPS1DnT7orbFsE";
+        const apiKey = MY_AI_KEY || "";
+
+        const systemPrompt = `You are "S37 Oracle", an advanced AI Build Consultant & Survival Assistant for the whitelisted "Ｓ３７ 「WL』" Minecraft SMP server.
+Your main parameters are:
+1. Zero-griefing & anti-cheat policies are non-negotiable. Griefing is strictly illegal!
+2. STRICT COMMAND LIMITATION: ONLY explain player commands: /register [pass], /login [pass], /sit, /lay, /crawl, /sethome [name], /home [name], /tpa [player], /tpaccept, /tpdeny, /pay [player] [amount], /bal. Never discuss OP or admin commands (/ban, /op, /whitelist, etc.).
+3. BUILD ANALYSIS VISION ROLE (CRITICAL): If an image is provided in the user prompt, analyze the landscape (clearing, meadows, hills, caverns) or existing builds. Give creative Minecraft architectural concepts!
+   Structure your build suggestions with:
+   - **Recommended Concept**: (e.g., Rustic windmill, Medieval castle keep, modern glass outposts)
+   - **Dimensions/Sizing**: (e.g., 15x15 grid, height 22 blocks)
+   - **Block Color Palette**: (e.g., Spruce Logs, Mossy Stone Bricks, Oak Planks, Cobblestone slabs for textures)
+   - **Style Advice**: Detailed tips on how to texture walls, add depth, use trapdoors/stairs, and keep it looking gorgeous and organic instead of a simple flat box.
+Use formatted Markdown with rich headers, bold text, and clean checklists.`;
+
+        // Email format validation helper
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // ==========================================
+        // PRIMARY APP ACTION DESPATCHERS
+        // ==========================================
+
+        function switchTab(targetPanelId) {
+            const panels = ['home', 'stats', 'rules', 'gallery', 'team', 'tips', 'capy', 'whitelist', 'feedback', 'oracle', 'shop', 'account'];
+            
             panels.forEach(panel => {
-                panel.classList.remove('panel-visible');
-                panel.classList.add('panel-hidden');
+                const el = document.getElementById(`panel-${panel}`);
+                if (el) {
+                    if (panel === targetPanelId) {
+                        el.classList.remove('panel-hidden');
+                        el.classList.add('panel-visible');
+                    } else {
+                        el.classList.remove('panel-visible');
+                        el.classList.add('panel-hidden');
+                    }
+                }
             });
 
-            // Make active
-            const targetPanel = document.getElementById(`panel-${tabId}`);
-            if (targetPanel) {
-                targetPanel.classList.remove('panel-hidden');
-                targetPanel.classList.add('panel-visible');
+            // If user enters stats or oracle tab, trigger actions
+            if (targetPanelId === 'stats') {
+                fetchLiveStats();
+            } else if (targetPanelId === 'oracle') {
+                setTimeout(() => {
+                    const chatBox = document.getElementById('oracle-chat');
+                    if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+                }, 100);
+            } else if (targetPanelId === 'feedback') {
+                fetchLiveRatings();
             }
 
-            // Close radial menu selector wheel upon action click
-            const radialMenu = document.getElementById('radial-menu');
-            radialMenu.classList.remove('open');
-            document.getElementById('radial-compass-icon').style.transform = 'rotate(0deg)';
+            // Collapse radial menu on choice
+            const menuContainer = document.getElementById('radial-menu');
+            if (menuContainer && menuContainer.classList.contains('open')) {
+                toggleRadialMenu();
+            }
         }
 
-        // 2. Circular Navigation Semicircle dial toggle trigger
         function toggleRadialMenu() {
-            const menu = document.getElementById('radial-menu');
-            const compass = document.getElementById('radial-compass-icon');
+            const menuContainer = document.getElementById('radial-menu');
+            const compassIcon = document.getElementById('radial-compass-icon');
             
-            menu.classList.toggle('open');
-            if (menu.classList.contains('open')) {
-                compass.style.transform = 'rotate(135deg)';
-            } else {
-                compass.style.transform = 'rotate(0deg)';
+            if (menuContainer) {
+                menuContainer.classList.toggle('open');
+                if (menuContainer.classList.contains('open')) {
+                    compassIcon.style.transform = 'rotate(135deg)';
+                } else {
+                    compassIcon.style.transform = 'rotate(0deg)';
+                }
             }
         }
 
-        // 3. Copy connection variables to system Clipboard
+        // Copy connection variables to system Clipboard
         function copyIP(elementId) {
             const ip = document.getElementById(elementId).innerText;
             const fallbackCopy = () => {
@@ -1005,7 +1601,7 @@
             }, 3000);
         }
 
-        // 4. Live Stats fetch dynamically utilizing Cache-Busting parameters
+        // Live Stats fetch dynamically
         async function fetchLiveStats() {
             const players = document.getElementById('mc-players');
             const discMembers = document.getElementById('discord-members');
@@ -1013,16 +1609,15 @@
             const dot = document.querySelector('.status-dot');
             const refreshIcon = document.getElementById('refresh-icon');
 
-            // Add spin style onto click trigger
+            if (!players || !discMembers) return;
+
             refreshIcon.classList.add('fa-spin');
 
             let playersCount = 0;
             let online = false;
-
-            // Generate unique Cache Buster variables on both query URLs
             const timestamp = Date.now();
 
-            // Fetch MC statistics: try mcsrvstat API with unique cache buster query parameter
+            // Fetch MC stats with cache buster
             try {
                 const res = await fetch(`https://api.mcsrvstat.us/2/${MC_SERVER_IP}?t=${timestamp}`);
                 const data = await res.json();
@@ -1031,10 +1626,10 @@
                     online = true;
                 }
             } catch (err) {
-                console.warn("First API layer blocked or cached, launching fallback pipeline...", err);
+                console.warn("Primary API layer cached, launching fallback pipeline...", err);
             }
 
-            // Fallback: Query minetools if standard status returns locked results
+            // Fallback API if cached
             if (!online) {
                 try {
                     const res = await fetch(`https://api.minetools.eu/ping/${MC_SERVER_IP}/25565?t=${timestamp}`);
@@ -1063,7 +1658,7 @@
                 dot.style.animation = 'none';
             }
 
-            // Fetch Discord stats dynamically through your server widget JSON API
+            // Fetch Discord stats dynamically through server widget API
             try {
                 const res = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`);
                 if (!res.ok) throw new Error("Discord API rejected widget requests");
@@ -1074,25 +1669,20 @@
                 simulateDiscordStats();
             }
 
-            // Remove spin after updates finish
             setTimeout(() => {
                 refreshIcon.classList.remove('fa-spin');
             }, 800);
         }
 
-        // Dynamic Discord members simulator fallback if Widget has API blockage
         function simulateDiscordStats() {
             const discordCount = document.getElementById('discord-members');
+            if (!discordCount) return;
             let mockCount = 84;
             animateCount(discordCount, 0, mockCount, 1200);
-            setInterval(() => {
-                const step = Math.floor(Math.random() * 3) - 1; // variance
-                mockCount += step;
-                discordCount.innerText = Math.max(10, mockCount);
-            }, 8000);
         }
 
         function animateCount(element, start, end, duration) {
+            if (!element) return;
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -1108,19 +1698,41 @@
             window.requestAnimationFrame(step);
         }
 
-        // 5. Interactive Whitelist Multi-Step Wizard System
+        // Whitelist Multi-Step Wizard
         let currentStep = 1;
         const stepTitles = {
             1: "Page 1: Identity & Age Checks",
-            2: "Page 2: Scenario and Rules Quiz",
+            2: "Page 2: Selected Category Questionnaire",
             3: "Page 3: Motives and Final Pledge"
         };
+
+        function handleAppTypeChange() {
+            const appType = document.getElementById('wl-type').value;
+            const ageNotice = document.getElementById('wl-age-notice');
+            
+            if (appType === 'staff') {
+                ageNotice.innerHTML = `<i class="fas fa-exclamation-triangle text-red-400"></i> <strong class="text-red-400">Staff Requirement:</strong> Candidates applying for the staff guild must be at least 15 years old.`;
+            } else {
+                ageNotice.innerHTML = `<i class="fas fa-exclamation-triangle"></i> S37 security guidelines require candidates to be at least 12 years of age to enter the whitelist pool.`;
+            }
+
+            document.getElementById('q-whitelist').classList.add('hidden');
+            document.getElementById('q-creator').classList.add('hidden');
+            document.getElementById('q-staff').classList.add('hidden');
+
+            if (appType === 'whitelist') {
+                document.getElementById('q-whitelist').classList.remove('hidden');
+            } else if (appType === 'creator') {
+                document.getElementById('q-creator').classList.remove('hidden');
+            } else if (appType === 'staff') {
+                document.getElementById('q-staff').classList.remove('hidden');
+            }
+        }
 
         function updateFormUI() {
             document.getElementById('step-title').innerText = stepTitles[currentStep];
             document.getElementById('step-counter').innerText = `Page ${currentStep} of 3`;
 
-            // Adjust form visible steps
             document.getElementById('step-1').classList.add('hidden');
             document.getElementById('step-2').classList.add('hidden');
             document.getElementById('step-3').classList.add('hidden');
@@ -1147,7 +1759,9 @@
 
         function validateStep() {
             const warning = document.getElementById('age-warning');
+            const warningText = document.getElementById('age-warning-text');
             warning.classList.add('hidden');
+            const appType = document.getElementById('wl-type').value;
 
             if (currentStep === 1) {
                 const ign = document.getElementById('wl-ign').value.trim();
@@ -1158,25 +1772,48 @@
                     triggerAlert("Fulfill all identification inputs to advance.");
                     return false;
                 }
-                if (age < 12) {
+                
+                if (appType === 'staff' && age < 15) {
+                    warningText.innerHTML = `<strong>Application Rejected:</strong> Candidates for S37 Staff Guild must be at least 15 years of age.`;
+                    warning.classList.remove('hidden');
+                    return false;
+                } else if (age < 12) {
+                    warningText.innerHTML = `<strong>Application Rejected:</strong> Candidate does not meet the minimum age threshold (12+).`;
                     warning.classList.remove('hidden');
                     return false;
                 }
             } else if (currentStep === 2) {
-                const chest = document.getElementById('wl-scenario-chest').value.trim();
-                const conflict = document.getElementById('wl-scenario-conflict').value.trim();
-                const grief = document.getElementById('wl-definition-grief').value.trim();
-
-                if (chest.length < 5 || conflict.length < 5 || grief.length < 5) {
-                    triggerAlert("Explain your answers nicely in full detail before advancing (min 5 characters).");
-                    return false;
+                if (appType === 'whitelist') {
+                    const chest = document.getElementById('wl-scenario-chest').value.trim();
+                    const conflict = document.getElementById('wl-scenario-conflict').value.trim();
+                    const grief = document.getElementById('wl-definition-grief').value.trim();
+                    if (chest.length < 5 || conflict.length < 5 || grief.length < 5) {
+                        triggerAlert("Explain your scenario answers in full detail before advancing.");
+                        return false;
+                    }
+                } else if (appType === 'creator') {
+                    const link = document.getElementById('wl-creator-link').value.trim();
+                    const style = document.getElementById('wl-creator-style').value.trim();
+                    const promo = document.getElementById('wl-creator-promo').value.trim();
+                    if (!link || style.length < 5 || promo.length < 5) {
+                        triggerAlert("Please specify channel links and content details to continue.");
+                        return false;
+                    }
+                } else if (appType === 'staff') {
+                    const exp = document.getElementById('wl-staff-exp').value.trim();
+                    const scenario = document.getElementById('wl-staff-scenario').value.trim();
+                    const motive = document.getElementById('wl-staff-motive').value.trim();
+                    if (exp.length < 5 || scenario.length < 5 || motive.length < 5) {
+                        triggerAlert("Ensure you answer all professional moderator questions fully.");
+                        return false;
+                    }
                 }
             } else if (currentStep === 3) {
                 const motivation = document.getElementById('wl-motivation').value.trim();
                 const check = document.getElementById('wl-rule-check').checked;
 
                 if (motivation.length < 10) {
-                    triggerAlert("Please detail your structural SMP build projects (min 10 characters).");
+                    triggerAlert("Please detail your structural SMP build projects.");
                     return false;
                 }
                 if (!check) {
@@ -1212,45 +1849,54 @@
             }
         }
 
-        // 6. Whitelist Submit automation system
         async function submitForm() {
             if (!validateStep()) return;
 
-            // Form data gather
-            const data = {
-                ign: document.getElementById('wl-ign').value.trim(),
-                discord: document.getElementById('wl-discord').value.trim(),
-                age: document.getElementById('wl-age').value,
-                chest: document.getElementById('wl-scenario-chest').value.trim(),
-                conflict: document.getElementById('wl-scenario-conflict').value.trim(),
-                grief: document.getElementById('wl-definition-grief').value.trim(),
-                motivation: document.getElementById('wl-motivation').value.trim()
-            };
+            const appType = document.getElementById('wl-type').value;
+            const ign = document.getElementById('wl-ign').value.trim();
+            const discord = document.getElementById('wl-discord').value.trim();
+            const age = document.getElementById('wl-age').value;
+            const motivation = document.getElementById('wl-motivation').value.trim();
 
-            const backupText = `==============================
-S37 WHITELIST SMP APPLICATION
-==============================
-Minecraft Player IGN: ${data.ign}
-Discord Handle Tag: ${data.discord}
-Age Verified: ${data.age} (Min Required: 12)
+            let payloadFields = [
+                { name: "Minecraft IGN", value: ign, inline: true },
+                { name: "Discord Tag", value: discord, inline: true },
+                { name: "Age Verified", value: age, inline: true },
+                { name: "Application Category", value: appType.toUpperCase(), inline: true }
+            ];
 
--- SCENARIOS & ENTRY QUIZ --
-Scenario 1 (Chest Looting Netherite):
-"${data.chest}"
+            let backupText = `==============================\nS37 ${appType.toUpperCase()} APPLICATION\n==============================\n`;
+            backupText += `IGN: ${ign}\nDiscord: ${discord}\nAge: ${age}\n`;
 
-Scenario 2 (Accidental Block Conflict):
-"${data.conflict}"
+            if (appType === 'whitelist') {
+                const chest = document.getElementById('wl-scenario-chest').value.trim();
+                const conflict = document.getElementById('wl-scenario-conflict').value.trim();
+                const grief = document.getElementById('wl-definition-grief').value.trim();
+                payloadFields.push({ name: "Chest Netherite Scenario", value: chest });
+                payloadFields.push({ name: "Accident Block Scenario", value: conflict });
+                payloadFields.push({ name: "Definition of Griefing", value: grief });
+                backupText += `Netherite Chest: "${chest}"\nConflict Resolution: "${conflict}"\nGriefing: "${grief}"\n`;
+            } else if (appType === 'creator') {
+                const link = document.getElementById('wl-creator-link').value.trim();
+                const style = document.getElementById('wl-creator-style').value.trim();
+                const promo = document.getElementById('wl-creator-promo').value.trim();
+                payloadFields.push({ name: "Creator Channel Link", value: link });
+                payloadFields.push({ name: "Content Style", value: style });
+                payloadFields.push({ name: "Audience Promotion", value: promo });
+                backupText += `Channel: ${link}\nStyle: "${style}"\nPromotion: "${promo}"\n`;
+            } else if (appType === 'staff') {
+                const exp = document.getElementById('wl-staff-exp').value.trim();
+                const scenario = document.getElementById('wl-staff-scenario').value.trim();
+                const motive = document.getElementById('wl-staff-motive').value.trim();
+                payloadFields.push({ name: "Prior Mod Experience", value: exp });
+                payloadFields.push({ name: "Chat Toxicity Scenario", value: scenario });
+                payloadFields.push({ name: "Motive & Reliability", value: motive });
+                backupText += `Experience: "${exp}"\nToxicity Action: "${scenario}"\nWhy choose me: "${motive}"\n`;
+            }
 
-Grief Definition Explanation:
-"${data.grief}"
+            payloadFields.push({ name: "Main Project/Goals", value: motivation });
+            backupText += `Goals: "${motivation}"\nRules Signed: TRUE\n==============================`;
 
-Player Survival Goals:
-"${data.motivation}"
-
-Signed Rules Pledge: TRUE
-==============================`;
-
-            // Prepare UI state changes
             document.getElementById('wl-form').classList.add('hidden');
             document.getElementById('form-actions').classList.add('hidden');
             document.getElementById('success-state').classList.remove('hidden');
@@ -1263,7 +1909,23 @@ Signed Rules Pledge: TRUE
             finished.classList.add('hidden');
             failed.classList.add('hidden');
 
-            // Fallback Trigger: check webhook configuration
+            // Persist to Firestore if user authenticated
+            if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                try {
+                    const ticketId = crypto.randomUUID();
+                    const ticketDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'tickets', ticketId);
+                    await setDoc(ticketDocRef, {
+                        type: 'whitelist_application',
+                        title: `S37 ${appType.toUpperCase()} - Candidate ${ign}`,
+                        status: 'Under Review',
+                        timestamp: new Date()
+                    });
+                    fetchUserDashboardData();
+                } catch (dbErr) {
+                    console.error("Firestore persistence warning:", dbErr);
+                }
+            }
+
             if (!DISCORD_WEBHOOK_URL) {
                 spinner.classList.add('hidden');
                 failed.classList.remove('hidden');
@@ -1271,21 +1933,12 @@ Signed Rules Pledge: TRUE
                 return;
             }
 
-            // Formulate Payload structure for channel 1258864675819487373
             const payload = {
                 embeds: [{
-                    title: "📝 New S37 Whitelist Entry Quiz",
-                    color: 1095553, // emerald
-                    fields: [
-                        { name: "Minecraft IGN", value: data.ign, inline: true },
-                        { name: "Discord Username", value: data.discord, inline: true },
-                        { name: "Age Verified", value: data.age, inline: true },
-                        { name: "Chest Netherite Scenario", value: data.chest },
-                        { name: "Accident Block Scenario", value: data.conflict },
-                        { name: "Definition of Griefing", value: data.grief },
-                        { name: "Plans & Goals", value: data.motivation }
-                    ],
-                    footer: { text: "S37 Automatic Whitelist Delivery" },
+                    title: `📝 New S37 ${appType.toUpperCase()} Application`,
+                    color: appType === 'staff' ? 15701044 : (appType === 'creator' ? 16104971 : 1095553),
+                    fields: payloadFields,
+                    footer: { text: "S37 Automated Whitelist System" },
                     timestamp: new Date()
                 }]
             };
@@ -1301,10 +1954,10 @@ Signed Rules Pledge: TRUE
                     spinner.classList.add('hidden');
                     finished.classList.remove('hidden');
                 } else {
-                    throw new Error("Discord server delivery returned status error: " + res.status);
+                    throw new Error("Discord webhook responded with error: " + res.status);
                 }
             } catch (err) {
-                console.error("Automated delivery network fail:", err);
+                console.error("Transmission failure:", err);
                 spinner.classList.add('hidden');
                 failed.classList.remove('hidden');
                 document.getElementById('failed-raw-text').value = backupText;
@@ -1321,19 +1974,40 @@ Signed Rules Pledge: TRUE
             } catch (err) {}
         }
 
-        // 7. Interactive Feedback & Report selection
+        // Interactive Feedback Tab switching (Tickets vs Stars)
+        function switchFeedbackSubTab(tabId) {
+            const btnTicket = document.getElementById('subbtn-ticket');
+            const btnRating = document.getElementById('subbtn-rating');
+            const viewTicket = document.getElementById('feedback-subtab-ticket');
+            const viewRating = document.getElementById('feedback-subtab-rating');
+            const actions = document.getElementById('fb-actions');
+
+            if (tabId === 'tab-ticket') {
+                btnTicket.className = "bg-mc-primary text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all";
+                btnRating.className = "text-gray-400 hover:text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all";
+                viewTicket.classList.remove('hidden');
+                viewRating.classList.add('hidden');
+                actions.classList.remove('hidden');
+            } else {
+                btnRating.className = "bg-amber-500 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all";
+                btnTicket.className = "text-gray-400 hover:text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all";
+                viewRating.classList.remove('hidden');
+                viewTicket.classList.add('hidden');
+                actions.classList.add('hidden'); // Rating forms are self-contained
+                fetchLiveRatings();
+            }
+        }
+
+        // Interactive Feedback Category Selection
         function selectFeedbackType(category, colorHex, element) {
             document.getElementById('fb-category').value = category;
-            
-            // Clear active states
             const cards = document.querySelectorAll('#feedback-types .type-card');
             cards.forEach(card => card.classList.remove('active'));
-            
-            // Set active color and border styling dynamically
             element.classList.add('active');
             element.style.setProperty('--card-accent-color', colorHex);
         }
 
+        // Support tickets submission
         async function submitFeedbackForm() {
             const category = document.getElementById('fb-category').value;
             const sender = document.getElementById('fb-sender').value.trim() || "Anonymous Player";
@@ -1345,39 +2019,44 @@ Signed Rules Pledge: TRUE
                 return;
             }
 
-            const backupFeedbackText = `=========================================
-S37 NEW FEEDBACK & REPORT SUBMISSION
-=========================================
-Category Type: ${category.toUpperCase()}
-Submitter: ${sender}
-Title/Summary: ${title}
+            const backupFeedbackText = `=========================================\nS37 SUPPORT TICKET SUBMISSION\n=========================================\nCategory: ${category.toUpperCase()}\nFrom: ${sender}\nTitle: ${title}\n\n"${details}"\n=========================================`;
 
--- DETAILED REASONING & PROOF --
-"${details}"
-=========================================`;
-
-            // Prepare UI States
             document.getElementById('feedback-form').classList.add('hidden');
             document.getElementById('fb-actions').classList.add('hidden');
             
             const successState = document.getElementById('fb-success-state');
             const failedState = document.getElementById('fb-failed-state');
 
-            // Embed customization
-            let embedColor = 65280; // Emerald (default)
+            let embedColor = 65280;
             let categoryIcon = "💡";
             if (category === "bug") {
-                embedColor = 6505215; // Indigo
+                embedColor = 6505215;
                 categoryIcon = "🐛";
             } else if (category === "website") {
-                embedColor = 16104971; // Amber
+                embedColor = 16104971;
                 categoryIcon = "💻";
             } else if (category === "staff") {
-                embedColor = 15701044; // Crimson Red
+                embedColor = 15701044;
                 categoryIcon = "🚨 Staff Report";
             }
 
-            // Fallback Trigger: check webhook configuration
+            // Persist Ticket into Firestore
+            if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                try {
+                    const ticketId = crypto.randomUUID();
+                    const ticketDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'tickets', ticketId);
+                    await setDoc(ticketDocRef, {
+                        type: 'feedback_report',
+                        title: `S37 ${category.toUpperCase()} - ${title}`,
+                        status: 'Dispatched',
+                        timestamp: new Date()
+                    });
+                    fetchUserDashboardData();
+                } catch (dbErr) {
+                    console.error("Firestore ticketing save failed:", dbErr);
+                }
+            }
+
             if (!DISCORD_FEEDBACK_WEBHOOK_URL) {
                 failedState.classList.remove('hidden');
                 document.getElementById('failed-fb-text').value = backupFeedbackText;
@@ -1389,9 +2068,9 @@ Title/Summary: ${title}
                     title: `${categoryIcon} S37 Ticket: ${title}`,
                     color: embedColor,
                     fields: [
-                        { name: "Submission Category", value: category.toUpperCase(), inline: true },
-                        { name: "Reported By / Contact", value: sender, inline: true },
-                        { name: "Details & Proof", value: details }
+                        { name: "Category", value: category.toUpperCase(), inline: true },
+                        { name: "Sender / Contact", value: sender, inline: true },
+                        { name: "Ticket Explanation & Evidence", value: details }
                     ],
                     footer: { text: "S37 Support & Feedback Pipeline" },
                     timestamp: new Date()
@@ -1408,7 +2087,7 @@ Title/Summary: ${title}
                 if (res.ok) {
                     successState.classList.remove('hidden');
                 } else {
-                    throw new Error("Discord API rejected feedback transmission: " + res.status);
+                    throw new Error("Discord API transaction rejection");
                 }
             } catch (err) {
                 console.error("Feedback transmission failed:", err);
@@ -1423,73 +2102,242 @@ Title/Summary: ${title}
             try {
                 document.execCommand('copy');
                 const toast = document.getElementById('fb-error-toast');
-                toast.innerText = "✓ System ticket data copied! Please share this with administrators in Discord channel #1303156105379184732!";
+                toast.innerText = "✓ Ticket data copied! Share it with admins in Discord channel #1303156105379184732!";
             } catch (err) {}
         }
 
         function resetFeedbackForm() {
-            // Reset input values
             document.getElementById('fb-title').value = '';
             document.getElementById('fb-details').value = '';
             document.getElementById('fb-sender').value = '';
-            
-            // Revert views
             document.getElementById('feedback-form').classList.remove('hidden');
             document.getElementById('fb-actions').classList.remove('hidden');
             document.getElementById('fb-success-state').classList.add('hidden');
             document.getElementById('fb-failed-state').classList.add('hidden');
         }
 
-        // ==========================================
-        // SECTION 10: S37 CHRONO-ORACLE AI CORE
-        // ==========================================
-        
-        // 1. АКО СИ СВАЛИЛ САЙТА НА КОМПЮТЪРА СИ:
-        // Твоят вграден работещ API ключ от Google AI Studio е интегриран тук автоматично!
-        const MY_AI_KEY = "AIzaSyAPRogKLC3VxGZ3ak_mwtPS1DnT7orbFsE";
+        // Star interactive hovering & selecting
+        function setRatingStars(val) {
+            activeRatingVal = val;
+            document.getElementById('rating-value').value = val;
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
 
-        // Проверка дали сме в среда за разработка или локално на твоя компютър
-        const apiKey = (MY_AI_KEY !== "ВАШИЯТ_БЕЗПЛАТЕН_API_KEY_ТУК" && MY_AI_KEY !== "") ? MY_AI_KEY : "";
-        const chatHistory = [];
+        // Hover Rating Stars
+        function hoverRatingStars(val) {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.classList.add('hovered');
+                } else {
+                    star.classList.remove('hovered');
+                }
+            });
+        }
 
-        // Predefined instructions training the assistant on S37 specific ecosystem rules, plugins, and lore
-        const systemPrompt = `You are "S37 Oracle", an advanced, highly specialized AI Guide and Build Consultant for the "Ｓ３７ 「WL』" Minecraft SMP (Survival Multiplayer) server.
-Your main parameters are:
-1. S37 Specific Guidelines: Keep players informed that we enforce a zero-tolerance policy towards griefing (grief is highly illegal!), hacking client engines (X-Ray, fly, speed), or abusive comments.
-2. STRICT COMMAND LIMITATION (CRITICAL): You must ONLY provide, explain, or list commands that are accessible to regular, normal players (default group in LuckPerms) on the S37 SMP. Under NO circumstances are you to mention, suggest, or detail administrative, moderator, operator (OP), or technical setup commands (such as /op, /deop, /ban, /kick, /tempban, /co rollback, /co l, /gamemode, /stop, /whitelist, /plugman, etc.). If a user asks for staff/admin commands, politely inform them that you only assist with player-level mechanics to keep the server secure.
-3. Approved Player Plugin Mechanisms Installed:
-   - AuthMe: Allows users of cracked or offline accounts. Command to register is /register [pass] [pass] and to login is /login [pass].
-   - GSit: Super cool interactive poses! Use /sit, /lay, or /crawl to relax around bases.
-   - Essentials (Player commands only): Teleport hubs. Pin locations with /sethome [name], teleport with /home [name]. Send teleport request to others with /tpa [player], accept with /tpaccept, deny with /tpdeny, go back to spawn with /spawn.
-   - Player Economy: Exchange virtual funds safely via /pay [player] [amount]. Check balance with /bal. Note that a grand virtual trading interface (/shop) is planned for future expansion once S37 grows bigger!
-4. Architectural build advisory: When asked for build ideas, generate creative, detailed Minecraft concept outlines, recommended blocks palettes, and building coordinates/planning.
-5. Redstone blueprints: Break down complex circuitry processes logically with step-by-step assembly lines.
-6. Whitelist assistance: Help candidates draft great responses to S37 Whitelist application scenario questions. Encourage them with positive feedback but keep S37 standards high.
-Keep responses concise, highly supportive, professional, and slightly futuristic/game-savvy. Use rich Markdown format with bold text, clean lists, and code blocks for coordinates or commands! Refer users to join the official Discord hub: https://discord.gg/FeNnMxEt3v.`;
+        function resetRatingStars() {
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach(star => star.classList.remove('hovered'));
+        }
 
-        // Interactive API request dispatcher utilizing exponential backoff retry algorithms
-        async function callGeminiAPI(query, retries = 3, delay = 1000) {
-            // Ако ключът е празен и сме извън платформата (localhost / file)
-            if (apiKey === "" && (window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
-                return `⚠️ **S37 AI Системно Известие:**
-                
-                Забелязах, че сте изтеглили и отворили уебсайта локално на вашия компютър! За да работи изкуственият интелект извън платформата:
-                
-                1. Отидете на **https://aistudio.google.com/** и натиснете **"Get API Key"** (напълно безплатно е и отнема 30 секунди).
-                2. Отворете файла \`index.html\` с текстов редактор (например Notepad, VS Code и др.).
-                3. Намерете променливата \`const MY_AI_KEY = "ВАШИЯТ_БЕЗПЛАТЕН_API_KEY_ТУК";\` (около ред 400).
-                4. Заменете текста с вашия нов ключ и запазете файла.
-                
-                След това изкуственият интелект ще работи за вас и вашите играчи навсякъде и завинаги!`;
+        // Submit Rating to database and Discord webhook
+        async function submitSiteRating() {
+            const ratingVal = parseInt(document.getElementById('rating-value').value);
+            const author = document.getElementById('rating-author').value.trim();
+            const comment = document.getElementById('rating-comment').value.trim();
+
+            if (!ratingVal || ratingVal < 1 || ratingVal > 5) {
+                triggerAlert("Please choose your star rating level (1-5)!");
+                return;
+            }
+            if (!author || !comment) {
+                triggerAlert("Please specify your Minecraft IGN and comments!");
+                return;
             }
 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-            
-            // Build the current conversation payload structure
+            try {
+                // Save publicly into Firestore public collection paths
+                const ratingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ratings');
+                await addDoc(ratingsRef, {
+                    stars: ratingVal,
+                    author: author,
+                    comment: comment,
+                    timestamp: new Date()
+                });
+
+                // Prepare stars representation
+                let starsString = "";
+                for(let i=0; i<5; i++) {
+                    starsString += i < ratingVal ? "⭐" : "⬛";
+                }
+
+                // Send Embed directly to custom Discord Ratings channel!
+                if (DISCORD_RATING_WEBHOOK_URL) {
+                    const discordPayload = {
+                        embeds: [{
+                            title: `⭐ New S37 Website Rating!`,
+                            color: 16751104, // Golden yellow
+                            fields: [
+                                { name: "Rating", value: `${starsString} (${ratingVal}/5)`, inline: true },
+                                { name: "User / IGN", value: author, inline: true },
+                                { name: "Comment", value: `"${comment}"` }
+                            ],
+                            footer: { text: "S37 Rating Engine" },
+                            timestamp: new Date()
+                        }]
+                    };
+
+                    await fetch(DISCORD_RATING_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(discordPayload)
+                    });
+                }
+
+                triggerSuccessToast("Оценката Ви е изпратена успешно в Discord! Благодарим Ви!");
+                
+                // Clear inputs
+                document.getElementById('rating-author').value = "";
+                document.getElementById('rating-comment').value = "";
+                setRatingStars(0);
+
+                // Reload local database list
+                fetchLiveRatings();
+
+            } catch (err) {
+                console.error("Failed storing site rating:", err);
+                triggerAlert("There was an issue processing your rating. Ensure Firestore rules permit public writes.");
+            }
+        }
+
+        // Fetch Live Ratings feed and compute calculations in real time
+        async function fetchLiveRatings() {
+            const feedContainer = document.getElementById('public-reviews-feed');
+            const avgValEl = document.getElementById('avg-rating-value');
+            const countEl = document.getElementById('total-ratings-count');
+            const starContainer = document.getElementById('avg-rating-stars');
+
+            if (!feedContainer) return;
+
+            try {
+                const ratingsRef = collection(db, 'artifacts', appId, 'public', 'data', 'ratings');
+                const querySnapshot = await getDocs(ratingsRef);
+
+                let feedHTML = "";
+                let totalStars = 0;
+                let ratingCount = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    ratingCount++;
+                    totalStars += parseInt(data.stars || 5);
+
+                    let itemStars = "";
+                    for(let i=0; i<5; i++) {
+                        itemStars += i < parseInt(data.stars) ? "★" : "☆";
+                    }
+
+                    feedHTML += `
+                        <div class="bg-mc-dark/40 border border-white/5 p-3 rounded-xl space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="font-bold text-indigo-300 font-display">${escapeHTML(data.author || 'Steve')}</span>
+                                <span class="text-amber-400 font-bold">${itemStars}</span>
+                            </div>
+                            <p class="text-[11px] text-gray-300 leading-relaxed">"${escapeHTML(data.comment || '')}"</p>
+                        </div>
+                    `;
+                });
+
+                if (ratingCount > 0) {
+                    feedContainer.innerHTML = feedHTML;
+                    const avgRating = (totalStars / ratingCount).toFixed(1);
+                    avgValEl.innerText = avgRating;
+                    countEl.innerText = `Based on ${ratingCount} ratings`;
+
+                    // Generate average yellow stars
+                    let avgStarsHTML = "";
+                    const fullStars = Math.round(avgRating);
+                    for(let i=0; i<5; i++) {
+                        avgStarsHTML += i < fullStars ? '<i class="fas fa-star text-amber-400"></i>' : '<i class="far fa-star text-gray-600"></i>';
+                    }
+                    starContainer.innerHTML = avgStarsHTML;
+                } else {
+                    feedContainer.innerHTML = `<p class="text-xs text-gray-500 italic text-center py-4">No reviews recorded yet. Be the first!</p>`;
+                    avgValEl.innerText = "0.0";
+                    countEl.innerText = "Based on 0 ratings";
+                    starContainer.innerHTML = '<i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>';
+                }
+
+            } catch (err) {
+                console.warn("Could not calculate ratings history. Generating initial baseline structures...", err);
+            }
+        }
+
+        // ==========================================
+        // S37 ORACLE (GEMINI ENGINE CONFIG)
+        // ==========================================
+
+        function handleOracleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                triggerAlert("Only image files are allowed for S37 Vision analysis.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64Data = event.target.result.split(',')[1];
+                selectedImageBase64 = base64Data;
+                selectedImageMimeType = file.type;
+                selectedImageName = file.name;
+
+                const previewRow = document.getElementById('oracle-preview-row');
+                const previewImg = document.getElementById('oracle-preview-img');
+                const previewName = document.getElementById('oracle-preview-name');
+
+                previewImg.src = event.target.result;
+                previewName.innerText = file.name.length > 20 ? file.name.substring(0, 18) + "..." : file.name;
+                previewRow.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearSelectedOracleImage() {
+            selectedImageBase64 = null;
+            selectedImageMimeType = null;
+            selectedImageName = "";
+            document.getElementById('oracle-file-picker').value = "";
+            document.getElementById('oracle-preview-row').classList.add('hidden');
+        }
+
+        async function callGeminiAPI(queryText, retries = 3, delay = 1000) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const userParts = [];
+
+            if (selectedImageBase64 && selectedImageMimeType) {
+                userParts.push({
+                    inlineData: {
+                        mimeType: selectedImageMimeType,
+                        data: selectedImageBase64
+                    }
+                });
+            }
+
+            userParts.push({ text: queryText });
+
             const payload = {
                 contents: [
                     ...chatHistory,
-                    { role: "user", parts: [{ text: query }] }
+                    { role: "user", parts: userParts }
                 ],
                 systemInstruction: {
                     parts: [{ text: systemPrompt }]
@@ -1504,46 +2352,49 @@ Keep responses concise, highly supportive, professional, and slightly futuristic
                 });
 
                 if (response.status === 429 && retries > 0) {
-                    // Back off exponentially upon encountering traffic limits (429 rate limit error code)
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    return callGeminiAPI(query, retries - 1, delay * 2);
+                    return callGeminiAPI(queryText, retries - 1, delay * 2);
                 }
 
                 if (!response.ok) {
-                    throw new Error(`HTTP network anomaly! status code: ${response.status}`);
+                    throw new Error(`HTTP Error: ${response.status}`);
                 }
 
                 const result = await response.json();
                 const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) throw new Error("Unexpected API payload format received.");
+                if (!text) throw new Error("Unexpected response structure.");
                 return text;
 
             } catch (err) {
                 if (retries > 0) {
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    return callGeminiAPI(query, retries - 1, delay * 2);
+                    return callGeminiAPI(queryText, retries - 1, delay * 2);
                 }
                 throw err;
             }
         }
 
-        function appendChatMessage(sender, text) {
+        function appendChatMessage(sender, text, attachedImgSrc = null) {
             const chatBox = document.getElementById('oracle-chat');
+            if (!chatBox) return;
             const messageWrapper = document.createElement('div');
             messageWrapper.className = 'flex items-start gap-3';
 
-            // Distinct formatting based on sender type
             if (sender === 'user') {
+                let imgHTML = "";
+                if (attachedImgSrc) {
+                    imgHTML = `<img src="${attachedImgSrc}" class="max-w-[150px] max-h-[150px] rounded-lg mb-2 border border-indigo-500/30 object-cover">`;
+                }
                 messageWrapper.innerHTML = `
                     <div class="flex-grow"></div>
                     <div class="bg-indigo-600 border border-indigo-400/20 text-xs text-white p-3.5 rounded-l-xl rounded-br-xl max-w-[85%] leading-relaxed">
                         <p class="font-semibold text-indigo-200 mb-1">You</p>
+                        ${imgHTML}
                         <p class="whitespace-pre-line">${escapeHTML(text)}</p>
                     </div>
                     <div class="bg-mc-card border border-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-user"></i></div>
                 `;
             } else {
-                // Parse markdown to HTML natively for formatted bold/code elements
                 const formattedHTML = parseMarkdown(text);
                 messageWrapper.innerHTML = `
                     <div class="bg-indigo-500/20 text-indigo-300 p-2 rounded-xl text-xs flex-shrink-0"><i class="fas fa-robot animate-pulse"></i></div>
@@ -1561,42 +2412,63 @@ Keep responses concise, highly supportive, professional, and slightly futuristic
         async function sendOracleMessage() {
             const inputEl = document.getElementById('oracle-input');
             const queryText = inputEl.value.trim();
-            if (!queryText) return;
+            if (!queryText && !selectedImageBase64) return;
 
-            // Display user query
-            appendChatMessage('user', queryText);
+            let attachedImgSrc = null;
+            if (selectedImageBase64 && selectedImageMimeType) {
+                attachedImgSrc = `data:${selectedImageMimeType};base64,${selectedImageBase64}`;
+            }
+
+            const displayPrompt = queryText || "Please analyze this uploaded screenshot.";
+            appendChatMessage('user', displayPrompt, attachedImgSrc);
             inputEl.value = '';
 
-            // Show active loader state
             const loader = document.getElementById('oracle-loader');
+            const statusText = document.getElementById('loader-status-text');
             loader.classList.remove('hidden');
 
+            if (attachedImgSrc) {
+                statusText.innerText = "Analyzing terrain screenshot and crafting build designs...";
+            } else {
+                statusText.innerText = "Channelling S37 knowledge matrix...";
+            }
+
             try {
-                const responseText = await callGeminiAPI(queryText);
+                const responseText = await callGeminiAPI(displayPrompt);
                 
-                // Track conversation history boundaries
-                chatHistory.push({ role: "user", parts: [{ text: queryText }] });
+                chatHistory.push({ role: "user", parts: [{ text: displayPrompt }] });
                 chatHistory.push({ role: "model", parts: [{ text: responseText }] });
                 
-                // Keep history trimmed to a healthy length to optimize context space
                 if (chatHistory.length > 20) {
                     chatHistory.splice(0, 2);
                 }
 
                 appendChatMessage('oracle', responseText);
+                clearSelectedOracleImage();
+
+                // Persist synchronized chat history into Firestore Rule 1 private path
+                if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                    const chatDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'chats', 'main');
+                    await setDoc(chatDocRef, {
+                        history: JSON.stringify(chatHistory),
+                        lastUpdated: new Date()
+                    });
+                }
 
             } catch (err) {
-                console.error("Oracle API channeling failure:", err);
-                appendChatMessage('oracle', "Apologies, Traveler. The cosmic Chrono-link to the servers was temporarily disrupted. Please retry in a moment, or ensure you are connected to the network.");
+                console.error("AI connection failure:", err);
+                appendChatMessage('oracle', "Apologies. The oracle connection is temporarily unstable. Please try again.");
             } finally {
                 loader.classList.add('hidden');
             }
         }
 
-        // Quick suggestions automated injector
         function sendQuickPrompt(promptText) {
-            document.getElementById('oracle-input').value = promptText;
-            sendOracleMessage();
+            const input = document.getElementById('oracle-input');
+            if (input) {
+                input.value = promptText;
+                sendOracleMessage();
+            }
         }
 
         function handleOracleKey(e) {
@@ -1605,35 +2477,629 @@ Keep responses concise, highly supportive, professional, and slightly futuristic
             }
         }
 
-        // Helper: Custom light markdown processor for clean code renders
         function parseMarkdown(text) {
             let processed = text;
-            
-            // Format Code Blocks
             processed = processed.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre class="bg-black/40 border border-white/5 p-2 rounded-lg font-mono text-[11px] my-2 text-indigo-300 overflow-x-auto">$2</pre>');
-            
-            // Format Inline Code
             processed = processed.replace(/`([^`]+)`/g, '<code class="bg-black/50 px-1.5 py-0.5 rounded text-indigo-400 font-mono text-[10px]">$1</code>');
-            
-            // Format bold tags
             processed = processed.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
-            
-            // Bullet points lists
             processed = processed.replace(/^\s*[-*]\s+(.*)$/gm, '<li class="list-disc ml-4 my-1 text-gray-300">$1</li>');
-
             return processed;
         }
 
-        // Helper: XSS sanitizer for safe string prints
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
             );
         }
 
-        // Initialize dashboard actions
+        // ==========================================
+        // SHOP CHECKOUT DESK
+        // ==========================================
+
+        function openPurchaseModal(itemName, price) {
+            selectedShopItem = itemName;
+            selectedShopPrice = price;
+
+            document.getElementById('modal-item-name').innerText = itemName;
+            document.getElementById('modal-item-price').innerText = price;
+            
+            document.getElementById('modal-form-content').classList.remove('hidden');
+            document.getElementById('modal-success-screen').classList.add('hidden');
+            document.getElementById('shop-purchase-modal').classList.remove('hidden');
+
+            if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                document.getElementById('shop-ign').value = auth.currentUser.displayName || "";
+            }
+        }
+
+        function closePurchaseModal() {
+            document.getElementById('shop-purchase-modal').classList.add('hidden');
+            document.getElementById('shop-ign').value = "";
+            document.getElementById('shop-discord').value = "";
+        }
+
+        async function dispatchPurchaseTicket() {
+            const ign = document.getElementById('shop-ign').value.trim();
+            const discord = document.getElementById('shop-discord').value.trim();
+
+            if (!ign || !discord) {
+                triggerAlert("Please specify your Minecraft IGN and Discord handle to complete checkout.");
+                return;
+            }
+
+            // Persist purchase log to Firestore
+            if (auth.currentUser && !auth.currentUser.isAnonymous) {
+                try {
+                    const txId = crypto.randomUUID();
+                    const txDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'transactions', txId);
+                    await setDoc(txDocRef, {
+                        itemName: selectedShopItem,
+                        price: selectedShopPrice,
+                        status: 'Processing',
+                        timestamp: new Date()
+                    });
+                    fetchUserDashboardData();
+                } catch (dbErr) {
+                    console.error("Firestore purchase logging failed:", dbErr);
+                }
+            }
+
+            if (!DISCORD_FEEDBACK_WEBHOOK_URL) {
+                triggerAlert("Exchange system is temporarily offline. Please contact S37 admins directly on Discord!");
+                return;
+            }
+
+            const payload = {
+                embeds: [{
+                    title: `🛒 S37 Purchase Request: ${selectedShopItem}`,
+                    color: 16751104, 
+                    fields: [
+                        { name: "Requested Item", value: selectedShopItem, inline: true },
+                        { name: "Amount / Price", value: selectedShopPrice, inline: true },
+                        { name: "Buyer Minecraft IGN", value: ign, inline: true },
+                        { name: "Buyer Discord Tag", value: discord, inline: true }
+                    ],
+                    footer: { text: "S37 Billing Desk" },
+                    timestamp: new Date()
+                }]
+            };
+
+            try {
+                const res = await fetch(DISCORD_FEEDBACK_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    document.getElementById('modal-form-content').classList.add('hidden');
+                    document.getElementById('success-item-name').innerText = selectedShopItem;
+                    document.getElementById('modal-success-screen').classList.remove('hidden');
+                } else {
+                    throw new Error("Discord API transaction failure.");
+                }
+            } catch (err) {
+                console.error("Purchase dispatch failed:", err);
+                triggerAlert("Network failure transmitting purchase. Please contact staff directly.");
+            }
+        }
+
+        // ==========================================
+        // PROFILE SECURITY & ACCOUNT ACTIONS
+        // ==========================================
+
+        function showVerificationScreen(email, alreadyExists = false) {
+            document.getElementById('auth-forms-wrapper').classList.add('hidden');
+            const dashboard = document.getElementById('profile-dashboard-wrapper');
+            if (dashboard) dashboard.classList.add('hidden');
+            document.getElementById('verification-pending-screen').classList.remove('hidden');
+            document.getElementById('verification-target-email').innerText = email;
+            
+            if (alreadyExists) {
+                triggerAlert("Нов линк е изпратен! Моля, проверете папка Spam/Gmail.");
+            }
+        }
+
+        // Register action - СТРОГО ОПРАВЕН за избягване на Firebase блокировки и верификационни забавяния
+        async function handleRegisterSubmit() {
+            const ign = document.getElementById('reg-ign').value.trim();
+            const discord = document.getElementById('reg-discord').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+
+            if (!ign || !discord || !email || !password) {
+                triggerAlert("Моля, попълнете абсолютно всички полета за регистрация.");
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                triggerAlert("Въведеният имейл формат е невалиден! (Пример: име@gmail.com)");
+                return;
+            }
+
+            try {
+                // 1. Първо създаваме акаунта във Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Задаваме му име за показване (Minecraft IGN)
+                await updateProfile(user, { displayName: ign });
+
+                // 3. МОМЕНТАЛНО изпращаме писмото за верификация, преди по-бавните операции в базата
+                await sendEmailVerification(user);
+
+                // 4. Генерираме 6-цифрен код за Discord верификация
+                const verifCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+                // 5. Записваме данните за профила сигурно във Firestore
+                try {
+                    const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'details');
+                    await setDoc(profileRef, {
+                        ign: ign,
+                        discord: discord,
+                        email: email,
+                        registeredAt: new Date(),
+                        verificationCode: verifCode,
+                        isDiscordLinked: false,
+                        discordUserId: ""
+                    });
+                } catch (dbErr) {
+                    console.warn("Firestore database logging skipped/deferred (check Database Rules):", dbErr);
+                }
+                
+                // 6. Изписваме потребителя незабавно, за да премине през екрана за верифициране
+                await signOut(auth);
+
+                showVerificationScreen(email);
+                triggerSuccessToast("Писмото е изпратено! Моля, проверете папка Спам или Кутията си в Gmail!");
+
+            } catch (err) {
+                // ВАЖНО: Тук са изчистени умишлените log повиквания за email-already-in-use,
+                // за да нямаме повече CONSOLE_ERROR на заден план в твоята конзола!
+                if (err.code === 'auth/operation-not-allowed') {
+                    triggerAlert("Firebase Authentication е деактивиран! Моля, активирайте метода Email/Password във вашия Firebase Console.");
+                } else if (err.code === 'auth/email-already-in-use') {
+                    triggerAlert("Този имейл адрес вече е регистриран! Моля, опитайте да влезете директно.");
+                } else if (err.code === 'auth/weak-password') {
+                    triggerAlert("Паролата трябва да е с дължина поне 6 символа!");
+                } else if (err.code === 'auth/invalid-email') {
+                    triggerAlert("Въведеният имейл адрес е в невалиден формат!");
+                } else {
+                    triggerAlert("Грешка при регистрация: " + err.message);
+                }
+            }
+        }
+
+        // Login action - СТРОГО ОПРАВЕН за плавен достъп
+        async function handleLoginSubmit() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!email || !password) {
+                triggerAlert("Моля, попълнете Имейл и Парола за да влезете.");
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                triggerAlert("Въведеният имейл е в невалиден формат! (Пример: име@gmail.com)");
+                return;
+            }
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Задължителна проверка дали Gmail акаунтът е верифициран преди достъп до лобито
+                if (!user.emailVerified) {
+                    await sendEmailVerification(user);
+                    await signOut(auth);
+                    showVerificationScreen(email, true);
+                    return;
+                }
+
+                triggerSuccessToast("Добре дошли обратно в S37!");
+            } catch (err) {
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                    triggerAlert("Грешен имейл или парола! Моля, опитайте отново.");
+                } else if (err.code === 'auth/invalid-email') {
+                    triggerAlert("Невалиден формат на имейл адреса.");
+                } else {
+                    triggerAlert("Неуспешен вход: " + err.message);
+                }
+            }
+        }
+
+        // Google Sign-In
+        async function handleGoogleSignIn() {
+            const provider = new GoogleAuthProvider();
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Create profile details automatically for Google User
+                const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'details');
+                const profileDoc = await getDoc(profileRef);
+
+                if (!profileDoc.exists()) {
+                    const verifCode = Math.floor(100000 + Math.random() * 900000).toString();
+                    await setDoc(profileRef, {
+                        ign: user.displayName || "Google_Steve",
+                        discord: "NotLinked",
+                        email: user.email,
+                        registeredAt: new Date(),
+                        verificationCode: verifCode,
+                        isDiscordLinked: false,
+                        discordUserId: ""
+                    });
+                }
+
+                triggerSuccessToast("Успешно свързване чрез Google профил!");
+            } catch (err) {
+                if (err.code === 'auth/unauthorized-domain') {
+                    triggerAlert("Този тестов домейн не е оторизиран във твоя Firebase! Добави го в Authentication -> Settings -> Authorized domains.");
+                } else {
+                    triggerAlert("Google Sign-In грешка: " + err.message);
+                }
+            }
+        }
+
+        async function handleResendVerification() {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    await sendEmailVerification(user);
+                    triggerSuccessToast("Изпратихме нов линк за потвърждение! Проверете Gmail.");
+                } catch(err) {
+                    triggerAlert("Моля, изчакайте малко преди да изпратите нов линк.");
+                }
+            } else {
+                triggerAlert("Моля, опитайте да се впишете отново, за да изпратите нов линк.");
+            }
+        }
+
+        function handleDiscordSignInGuide() {
+            document.getElementById('discord-signin-modal').classList.remove('hidden');
+        }
+
+        function closeDiscordSignInGuide() {
+            document.getElementById('discord-signin-modal').classList.add('hidden');
+        }
+
+        async function handleLogout() {
+            try {
+                document.getElementById('verification-pending-screen').classList.add('hidden');
+                document.getElementById('auth-forms-wrapper').classList.remove('hidden');
+                
+                await signOut(auth);
+                await signInAnonymously(auth);
+                triggerSuccessToast("Сесията е прекратена.");
+            } catch (err) {
+                console.error("Logout issue:", err);
+            }
+        }
+
+        function triggerSuccessToast(message) {
+            const container = document.createElement("div");
+            container.className = "fixed bottom-5 left-5 z-50 bg-mc-primary text-white font-semibold py-3 px-6 rounded-xl shadow-xl transition-all duration-300 transform translate-y-0 text-xs flex items-center gap-2";
+            container.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            document.body.appendChild(container);
+            setTimeout(() => {
+                container.classList.add("opacity-0", "translate-y-4");
+                setTimeout(() => container.remove(), 300);
+            }, 3000);
+        }
+
+        // Load dashboard lists (Tickets & Transactions) from Firestore private user paths
+        async function fetchUserDashboardData() {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
+
+            const transactionsList = document.getElementById('profile-transactions-list');
+            const ticketsList = document.getElementById('profile-tickets-list');
+
+            if (!transactionsList || !ticketsList) return;
+
+            // 1. Fetch User Transactions (Rule 1 Path)
+            try {
+                const txCollectionRef = collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'transactions');
+                const txSnapshot = await getDocs(txCollectionRef);
+                
+                let txHTML = "";
+                if (txSnapshot.empty) {
+                    txHTML = `<p class="text-xs text-gray-500 italic py-4 text-center">No purchases requested yet.</p>`;
+                } else {
+                    txSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        txHTML += `
+                            <div class="bg-mc-dark/60 border border-white/5 p-3 rounded-xl flex justify-between items-center text-xs">
+                                <div>
+                                    <h4 class="font-bold text-white">${data.itemName}</h4>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'Recent'}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-mc-primary font-bold">${data.price}</p>
+                                    <span class="text-[9px] bg-amber-500/10 text-mc-accent px-2 py-0.5 rounded border border-amber-500/10 mt-1 inline-block">${data.status || 'Processing'}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                transactionsList.innerHTML = txHTML;
+            } catch (err) {
+                console.error("Fetch transactions failed:", err);
+            }
+
+            // 2. Fetch User Tickets
+            try {
+                const ticketsCollectionRef = collection(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'tickets');
+                const ticketSnapshot = await getDocs(ticketsCollectionRef);
+                
+                let ticketHTML = "";
+                if (ticketSnapshot.empty) {
+                    ticketHTML = `<p class="text-xs text-gray-500 italic py-4 text-center">No applications or feedback tickets submitted yet.</p>`;
+                } else {
+                    ticketSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        ticketHTML += `
+                            <div class="bg-mc-dark/60 border border-white/5 p-3 rounded-xl flex justify-between items-center text-xs">
+                                <div>
+                                    <h4 class="font-bold text-white">${data.title}</h4>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'Recent'}</p>
+                                </div>
+                                <span class="text-[9px] bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/10">${data.status || 'Pending'}</span>
+                            </div>
+                        `;
+                    });
+                }
+                ticketsList.innerHTML = ticketHTML;
+            } catch (err) {
+                console.error("Fetch tickets failed:", err);
+            }
+        }
+
+        // Fetch saved chat history
+        async function fetchSavedChatHistory() {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
+            try {
+                const chatDocRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, 'chats', 'main');
+                const chatDoc = await getDoc(chatDocRef);
+                if (chatDoc.exists()) {
+                    const data = chatDoc.data();
+                    chatHistory = JSON.parse(data.history || "[]");
+                    
+                    // Render chat history
+                    const chatBox = document.getElementById('oracle-chat');
+                    if (chatBox) {
+                        chatBox.innerHTML = ''; // Clear introductory message to render saved log
+                        chatHistory.forEach(item => {
+                            if (item.role === 'user') {
+                                appendChatMessage('user', item.parts[0].text);
+                            } else {
+                                appendChatMessage('oracle', item.parts[0].text);
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Fetch chat history failed:", err);
+            }
+        }
+
+        // Dynamic dashboard layout injector
+        async function renderDashboardHTML(ign, discord, email, user) {
+            const profileDashboard = document.getElementById('profile-dashboard-wrapper');
+            if (!profileDashboard) return;
+            
+            // Get latest profile details to extract verification code
+            const profileDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'details');
+            const profileDoc = await getDoc(profileDocRef);
+            
+            let verificationCode = "------";
+            let isDiscordLinked = false;
+
+            if (profileDoc.exists()) {
+                const data = profileDoc.data();
+                verificationCode = data.verificationCode || "------";
+                isDiscordLinked = data.isDiscordLinked || false;
+            }
+
+            // Create custom Verification status badge
+            let verificationCardHTML = "";
+            if (!isDiscordLinked) {
+                verificationCardHTML = `
+                    <div class="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-5 space-y-3 text-left">
+                        <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fas fa-exclamation-triangle"></i> Action Required: Link Discord Account
+                        </h4>
+                        <p class="text-[11px] text-gray-300 leading-relaxed">
+                            To finalize your registration and automatically get access to whitelist channels, send this code to our Discord Bot:
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-black/50 border border-amber-500/30 px-5 py-2.5 rounded-xl text-lg font-bold font-mono tracking-widest text-amber-400 select-all" id="prof-verif-code">
+                                ${verificationCode}
+                            </div>
+                            <button onclick="copyIP('prof-verif-code')" class="bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 p-2.5 rounded-xl transition-all" title="Copy verification code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-gray-500">
+                            Command format: <code class="bg-black/40 px-1 py-0.5 rounded text-amber-500 font-mono">/verify ${verificationCode}</code> inside the bot direct messages.
+                        </p>
+                    </div>
+                `;
+            } else {
+                verificationCardHTML = `
+                    <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-5 flex items-center gap-4 text-left">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg shadow-inner shadow-emerald-500/10">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Discord Account Linked</h4>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Your web profile is fully linked and verified with the S37 Discord bot network.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Update main profile container
+            profileDashboard.innerHTML = `
+                <!-- User Welcome Info Banner -->
+                <div class="bg-indigo-950/20 border border-indigo-500/20 rounded-2xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center text-2xl shadow-inner">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                Welcome, <span class="text-indigo-300">${ign}</span>
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-0.5">Discord Registered Tag: <span class="text-indigo-300/80 font-mono">${discord}</span></p>
+                            <p class="text-[10px] text-indigo-400">${email}</p>
+                        </div>
+                    </div>
+                    <button id="logout-btn-dashboard" class="bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/30 text-red-400 px-4 py-2 rounded-xl text-xs font-semibold transition-all">
+                        Disconnect Account
+                    </button>
+                </div>
+
+                <!-- Discord Connection Code Card Insertion -->
+                ${verificationCardHTML}
+
+                <!-- Main lists grid (Transactions & Tickets) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col min-h-[300px]">
+                        <h3 class="font-display text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-shopping-bag text-mc-accent"></i> My Shop Transactions
+                        </h3>
+                        <div class="flex-grow scrollable-content overflow-y-auto space-y-2 pr-1" id="profile-transactions-list">
+                            <p class="text-xs text-gray-500 italic py-4 text-center">No purchases requested yet.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-mc-dark/40 border border-white/5 rounded-2xl p-5 flex flex-col min-h-[300px]">
+                        <h3 class="font-display text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-file-invoice text-mc-primary"></i> My Submissions & Tickets
+                        </h3>
+                        <div class="flex-grow scrollable-content overflow-y-auto space-y-2 pr-1" id="profile-tickets-list">
+                            <p class="text-xs text-gray-500 italic py-4 text-center">No applications or feedback tickets submitted yet.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Attach logout listener to newly injected button
+            const dashboardLogoutBtn = document.getElementById('logout-btn-dashboard');
+            if (dashboardLogoutBtn) {
+                dashboardLogoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Re-fetch transactions & ticket histories
+            fetchUserDashboardData();
+        }
+
+        // Handle profile render routing
+        onAuthStateChanged(auth, async (user) => {
+            const authWrapper = document.getElementById('auth-forms-wrapper');
+            const profileDashboard = document.getElementById('profile-dashboard-wrapper');
+            const verificationPending = document.getElementById('verification-pending-screen');
+            const badge = document.getElementById('account-status-badge');
+            const headerProfileText = document.getElementById('profile-hud-text');
+
+            if (!user) {
+                await signInAnonymously(auth);
+                return;
+            }
+
+            if (user.isAnonymous) {
+                if (authWrapper) authWrapper.classList.remove('hidden');
+                if (profileDashboard) profileDashboard.classList.add('hidden');
+                if (verificationPending) verificationPending.classList.add('hidden');
+                if (badge) {
+                    badge.innerText = "Guest Session";
+                    badge.className = "text-xs bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1 rounded-full uppercase font-bold tracking-wider";
+                }
+                if (headerProfileText) headerProfileText.innerText = "Connect Profile";
+            } else {
+                // Check if user verified their email address
+                if (!user.emailVerified) {
+                    showVerificationScreen(user.email);
+                    if (badge) {
+                        badge.innerText = "Verification Pending";
+                        badge.className = "text-xs bg-amber-500/10 text-amber-500 border border-amber-500/20 px-3 py-1 rounded-full uppercase font-bold tracking-wider";
+                    }
+                    if (headerProfileText) headerProfileText.innerText = "Verify Email";
+                    return;
+                }
+
+                if (badge) {
+                    badge.innerText = "S37 Connected";
+                    badge.className = "text-xs bg-mc-primary/10 text-mc-primary border border-mc-primary/20 px-3 py-1 rounded-full uppercase font-bold tracking-wider";
+                }
+
+                const profileDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'details');
+                const profileDoc = await getDoc(profileDocRef);
+                
+                let ign = user.displayName || "Steve";
+                let discord = "Steve_Tag";
+
+                if (profileDoc.exists()) {
+                    const prof = profileDoc.data();
+                    ign = prof.ign || ign;
+                    discord = prof.discord || discord;
+                }
+
+                if (headerProfileText) headerProfileText.innerText = ign;
+                if (authWrapper) authWrapper.classList.add('hidden');
+                if (profileDashboard) profileDashboard.classList.remove('hidden');
+                if (verificationPending) verificationPending.classList.add('hidden');
+
+                // Load with code verification details injected
+                renderDashboardHTML(ign, discord, user.email, user);
+                fetchSavedChatHistory();
+            }
+        });
+
+        // Register window globals for HTML trigger points
+        window.switchTab = switchTab;
+        window.toggleRadialMenu = toggleRadialMenu;
+        window.copyIP = copyIP;
+        window.fetchLiveStats = fetchLiveStats;
+        window.handleAppTypeChange = handleAppTypeChange;
+        window.prevStep = prevStep;
+        window.nextStep = nextStep;
+        window.submitForm = submitForm;
+        window.selectFeedbackType = selectFeedbackType;
+        window.submitFeedbackForm = submitFeedbackForm;
+        window.resetFeedbackForm = resetFeedbackForm;
+        window.copyRawFailedFeedback = copyRawFailedFeedback;
+        window.sendQuickPrompt = sendQuickPrompt;
+        window.clearSelectedOracleImage = clearSelectedOracleImage;
+        window.sendOracleMessage = sendOracleMessage;
+        window.handleOracleKey = handleOracleKey;
+        window.openPurchaseModal = openPurchaseModal;
+        window.closePurchaseModal = closePurchaseModal;
+        window.dispatchPurchaseTicket = dispatchPurchaseTicket;
+        window.handleOracleFileSelect = handleOracleFileSelect;
+        window.handleLoginSubmit = handleLoginSubmit;
+        window.handleRegisterSubmit = handleRegisterSubmit;
+        window.handleGoogleSignIn = handleGoogleSignIn;
+        window.handleDiscordSignInGuide = handleDiscordSignInGuide;
+        window.closeDiscordSignInGuide = closeDiscordSignInGuide;
+        window.handleResendVerification = handleResendVerification;
+        window.handleLogout = handleLogout;
+        window.copyRawFailedText = copyRawFailedText;
+        
+        // Rating Engine bindings
+        window.switchFeedbackSubTab = switchFeedbackSubTab;
+        window.setRatingStars = setRatingStars;
+        window.hoverRatingStars = hoverRatingStars;
+        window.resetRatingStars = resetRatingStars;
+        window.submitSiteRating = submitSiteRating;
+        window.fetchLiveRatings = fetchLiveRatings;
+
+        // Initialize HUD stats on mount
         window.addEventListener('load', () => {
             fetchLiveStats();
+            fetchLiveRatings();
         });
 
     </script>
