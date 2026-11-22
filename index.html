@@ -40,23 +40,30 @@
 
     <style>
         body {
-            background-color: #080a0f;
+            background-color: #06080c;
             color: #e2e8f0;
             overflow-x: hidden;
             font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
         }
 
         .mc-bg-pattern {
-            background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 0);
-            background-size: 24px 24px;
+            background-image: radial-gradient(rgba(16, 185, 129, 0.07) 1px, transparent 0);
+            background-size: 28px 28px;
         }
 
         .portal-glow {
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.35);
         }
 
         .emerald-glow {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
         }
 
         ::-webkit-scrollbar {
@@ -64,99 +71,129 @@
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #0b0d12;
+            background: #080a0f;
         }
         ::-webkit-scrollbar-thumb {
             background: #1f293d;
             border-radius: 4px;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.25);
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #10b981;
         }
 
         .glass-panel {
-            background: rgba(18, 22, 32, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(15, 19, 29, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
+        .glass-panel-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         .glass-panel-hover:hover {
-            border-color: rgba(16, 185, 129, 0.4);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-color: rgba(16, 185, 129, 0.45);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.12);
         }
 
         .btn-pixel {
             position: relative;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .btn-pixel:hover {
+            transform: translateY(-2px);
         }
         .btn-pixel:active {
-            transform: translateY(2px);
+            transform: translateY(1px);
         }
 
         @keyframes pulse-fast {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
+            50% { opacity: 0.4; transform: scale(1.15); }
         }
         .ping-pulse {
             animation: pulse-fast 1.5s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
         }
     </style>
 </head>
 <body class="mc-bg-pattern min-h-screen flex flex-col justify-between selection:bg-mc-primary selection:text-black relative">
 
-    <canvas id="bg-particles" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
+    <canvas id="bg-particles" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-45"></canvas>
 
     <!-- Global Toast Notifications -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Main Header / Navigation -->
-    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <header class="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
             
             <!-- Logo & Brand -->
-            <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-mc-primary to-mc-secondary flex items-center justify-center shadow-lg emerald-glow">
-                    <i class="fa-solid font-pixel text-lg text-black">S37</i>
+            <div class="flex items-center justify-between w-full lg:w-auto">
+                <div class="flex items-center gap-3.5 cursor-pointer group" onclick="switchTab('home')">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-mc-primary via-emerald-400 to-mc-secondary flex items-center justify-center shadow-lg emerald-glow group-hover:scale-105 transition">
+                        <span class="font-pixel text-sm text-black font-bold">S37</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-display font-black tracking-wider text-white flex items-center gap-2">
+                            S37 SMP <span class="text-[10px] font-pixel px-2 py-0.5 rounded-md bg-mc-primary/20 text-mc-primary border border-mc-primary/40">SEASON 3</span>
+                        </h1>
+                        <p class="text-xs text-gray-400 font-medium">Next-Gen Survival Multiplayer</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-xl font-display font-black tracking-wider text-white flex items-center gap-2">
-                        S37 SMP <span class="text-xs font-pixel px-2 py-0.5 rounded bg-mc-primary/20 text-mc-primary border border-mc-primary/30">SEASON 3</span>
-                    </h1>
-                    <p class="text-xs text-gray-400">Survival Multiplayer Network</p>
+
+                <!-- Server IP Bar (Mobile visible) -->
+                <div class="flex lg:hidden items-center gap-2 bg-black/60 border border-emerald-500/40 rounded-xl px-3 py-1.5 cursor-pointer" onclick="copyServerIP()">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 ping-pulse"></div>
+                    <span class="font-mono text-xs font-bold text-emerald-400">s37.mc-srv.pro</span>
+                    <i class="fa-regular fa-copy text-xs text-gray-400"></i>
                 </div>
             </div>
 
-            <!-- Server IP Bar -->
-            <div class="flex items-center gap-2 bg-black/50 border border-emerald-500/30 rounded-xl px-4 py-2 hover:border-emerald-500 transition-all cursor-pointer group" onclick="copyServerIP()">
+            <!-- Server IP Bar (Desktop) -->
+            <div class="hidden lg:flex items-center gap-2.5 bg-black/60 border border-emerald-500/30 rounded-xl px-4 py-2 hover:border-emerald-400 transition-all cursor-pointer group shadow-inner" onclick="copyServerIP()">
                 <div id="status-dot-header" class="w-2.5 h-2.5 rounded-full bg-emerald-400 ping-pulse"></div>
-                <span class="text-xs uppercase font-bold text-gray-400">IP:</span>
+                <span class="text-[11px] uppercase font-bold text-gray-400 tracking-wider">SERVER IP:</span>
                 <span id="server-ip-header" class="font-mono text-sm font-bold text-emerald-400 group-hover:text-emerald-300">s37.mc-srv.pro</span>
-                <i class="fa-regular fa-copy text-xs text-gray-400 group-hover:text-white ml-2 transition"></i>
+                <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 group-hover:bg-emerald-500 group-hover:text-black transition font-bold ml-1">COPY</span>
             </div>
 
             <!-- Navigation Tabs -->
-            <nav class="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/5 overflow-x-auto max-w-full">
-                <button onclick="switchTab('home')" id="tab-btn-home" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-mc-primary text-black font-bold">
-                    <i class="fa-solid fa-house"></i> <span>Home</span>
+            <nav class="flex items-center gap-1.5 bg-black/50 p-1.5 rounded-2xl border border-white/10 overflow-x-auto max-w-full shadow-inner">
+                <button onclick="switchTab('home')" id="tab-btn-home" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-mc-primary text-black shadow-md shrink-0">
+                    <i class="fa-solid fa-house"></i> <span>Начало</span>
                 </button>
-                <button onclick="switchTab('oracle')" id="tab-btn-oracle" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-mc-secondary"></i> <span>Oracle AI</span>
-                </button>
-                <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
-                    <i class="fa-solid fa-images text-mc-accent"></i> <span>Gallery</span>
-                </button>
-                <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+                <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-trophy text-yellow-400"></i> <span>Stats & Ranks</span>
                 </button>
-                <button onclick="switchTab('vault')" id="tab-btn-vault" class="nav-tab px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-2">
+                <button onclick="switchTab('ideas')" id="tab-btn-ideas" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i> <span>Идеи за Сървъра</span>
+                </button>
+                <button onclick="switchTab('oracle')" id="tab-btn-oracle" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-wand-magic-sparkles text-mc-secondary"></i> <span>Oracle AI</span>
+                </button>
+                <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-images text-mc-accent"></i> <span>Галерия</span>
+                </button>
+                <button onclick="switchTab('vault')" id="tab-btn-vault" class="nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-shield-halved text-mc-primary"></i> <span>Vault</span>
                 </button>
             </nav>
 
-            <div class="hidden lg:flex items-center gap-3">
-                <button id="sound-toggle-btn" onclick="toggleAudio()" class="w-9 h-9 rounded-lg glass-panel hover:bg-white/10 flex items-center justify-center text-gray-300 transition" title="Toggle Sound FX">
+            <div class="hidden xl:flex items-center gap-3">
+                <button id="sound-toggle-btn" onclick="toggleAudio()" class="w-10 h-10 rounded-xl glass-panel hover:bg-white/10 flex items-center justify-center text-gray-300 hover:text-white transition" title="Toggle Sound FX">
                     <i id="sound-icon" class="fa-solid fa-volume-high"></i>
                 </button>
             </div>
@@ -167,84 +204,108 @@
 
         <!-- TAB 1: HOME SECTION -->
         <section id="tab-home" class="tab-content space-y-8">
-            <div class="relative rounded-3xl overflow-hidden glass-panel border border-emerald-500/20 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="absolute inset-0 bg-gradient-to-r from-mc-dark via-mc-dark/80 to-transparent z-0 pointer-events-none"></div>
-                <div class="relative z-10 max-w-xl space-y-4">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-widest">
-                        <i class="fa-solid fa-bolt"></i> S37 SMP Community Hub
+            <div class="relative rounded-3xl overflow-hidden glass-panel border border-emerald-500/30 p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-2xl">
+                <div class="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="relative z-10 max-w-2xl space-y-5">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold uppercase tracking-widest shadow-sm">
+                        <i class="fa-solid fa-sparkles"></i> Официален Портал • Сезон 3
                     </div>
-                    <h2 class="text-4xl md:text-5xl font-display font-extrabold text-white leading-tight">
-                        Evolve Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-mc-primary to-emerald-300">Survival</span> Journey
+                    <h2 class="text-4xl md:text-6xl font-display font-black text-white leading-tight tracking-tight">
+                        Изгради Своята <span class="text-transparent bg-clip-text bg-gradient-to-r from-mc-primary via-emerald-300 to-teal-200">Легенда</span> в S37 SMP
                     </h2>
                     <p class="text-gray-300 text-sm md:text-base leading-relaxed">
-                        Welcome to S37 SMP. Interact with our custom AI Realm Oracle, explore community builds, register your player stats to join the live leaderboard, and manage your private vault key safely.
+                        Добре дошъл в общността на S37! Регистрирай своя Minecraft профил, изпълнявай над 35 уникални сезонни куеста, състезавай се за Топ 3 подиума и предлагай нови идеи за развитието на сървъра.
                     </p>
                     <div class="flex flex-wrap items-center gap-4 pt-2">
-                        <button onclick="switchTab('leaderboard')" class="btn-pixel bg-mc-primary hover:bg-emerald-400 text-black font-bold px-6 py-3 rounded-xl emerald-glow flex items-center gap-2 transition">
-                            <i class="fa-solid fa-trophy"></i> Join Leaderboard
+                        <button onclick="switchTab('leaderboard')" class="btn-pixel bg-gradient-to-r from-mc-primary to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-black font-extrabold px-6 py-3.5 rounded-xl emerald-glow flex items-center gap-2.5 text-xs md:text-sm">
+                            <i class="fa-solid fa-trophy text-base"></i> Класация & Куестове
                         </button>
-                        <button onclick="switchTab('oracle')" class="btn-pixel bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-xl border border-white/20 flex items-center gap-2 transition">
-                            <i class="fa-solid fa-comments"></i> Talk to Oracle
+                        <button onclick="switchTab('ideas')" class="btn-pixel bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-bold px-6 py-3.5 rounded-xl border border-amber-500/40 flex items-center gap-2.5 text-xs md:text-sm">
+                            <i class="fa-solid fa-lightbulb text-base"></i> Предложи Идея
+                        </button>
+                        <button onclick="switchTab('oracle')" class="btn-pixel bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-3.5 rounded-xl border border-white/20 flex items-center gap-2 text-xs md:text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles text-mc-secondary"></i> Oracle AI
                         </button>
                     </div>
                 </div>
 
-                <div class="relative z-10 w-full md:w-auto grid grid-cols-2 gap-4">
-                    <div class="glass-panel p-5 rounded-2xl border border-white/5 text-center space-y-1">
-                        <i class="fa-solid fa-users text-2xl text-mc-primary"></i>
+                <div class="relative z-10 w-full lg:w-auto grid grid-cols-2 gap-4 min-w-[300px]">
+                    <div class="glass-panel p-5 rounded-2xl border border-emerald-500/20 text-center space-y-1.5 shadow-lg">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-mc-primary flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
                         <h4 id="stat-players-online" class="text-2xl font-bold font-display text-white">Зареждане...</h4>
-                        <p class="text-xs text-gray-400">Онлайн Играчи</p>
+                        <p class="text-xs text-gray-400 font-medium">Онлайн Играчи</p>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl border border-white/5 text-center space-y-1">
-                        <i id="stat-status-icon" class="fa-solid fa-signal text-2xl text-mc-secondary"></i>
+                    <div class="glass-panel p-5 rounded-2xl border border-purple-500/20 text-center space-y-1.5 shadow-lg">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-mc-secondary flex items-center justify-center mx-auto text-lg">
+                            <i id="stat-status-icon" class="fa-solid fa-signal"></i>
+                        </div>
                         <h4 id="stat-server-status" class="text-2xl font-bold font-display text-white">Зареждане...</h4>
-                        <p class="text-xs text-gray-400">Статус на Сървъра</p>
+                        <p class="text-xs text-gray-400 font-medium">Статус на Сървъра</p>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl border border-white/5 text-center space-y-1">
-                        <i class="fa-solid fa-cube text-2xl text-mc-accent"></i>
+                    <div class="glass-panel p-5 rounded-2xl border border-amber-500/20 text-center space-y-1.5 shadow-lg">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-mc-accent flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
                         <h4 id="stat-server-version" class="text-2xl font-bold font-display text-white">1.21.x</h4>
-                        <p class="text-xs text-gray-400">Minecraft Версия</p>
+                        <p class="text-xs text-gray-400 font-medium">Minecraft Версия</p>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl border border-white/5 text-center space-y-1">
-                        <i class="fa-solid fa-shield text-2xl text-mc-red"></i>
-                        <h4 class="text-2xl font-bold font-display text-white">24/7</h4>
-                        <p class="text-xs text-gray-400">Uptime Защита</p>
+                    <div class="glass-panel p-5 rounded-2xl border border-red-500/20 text-center space-y-1.5 shadow-lg">
+                        <div class="w-10 h-10 rounded-xl bg-red-500/15 text-mc-red flex items-center justify-center mx-auto text-lg">
+                            <i class="fa-solid fa-scroll"></i>
+                        </div>
+                        <h4 class="text-2xl font-bold font-display text-white">36 Куеста</h4>
+                        <p class="text-xs text-gray-400 font-medium">Сезонни Мисии</p>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-panel p-6 rounded-2xl border border-white/5 glass-panel-hover transition space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 glass-panel-hover space-y-3 cursor-pointer" onclick="switchTab('leaderboard')">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white font-display">36 Сезонни Куеста</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Избери завършените си мисии в 5 категории, трупай SMP Coins и се качи на Топ 3 подиума.</p>
+                    <span class="text-xs font-bold text-yellow-400 inline-flex items-center gap-1 pt-1">
+                        Виж Класацията <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 glass-panel-hover space-y-3 cursor-pointer" onclick="switchTab('ideas')">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white font-display">Идеи & Гласуване</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Имаш идея за нов плъгин, ивент или сграда? Публикувай я и гласувай за предложенията на другите.</p>
+                    <span class="text-xs font-bold text-amber-400 inline-flex items-center gap-1 pt-1">
+                        Отвори Идеите <i class="fa-solid fa-arrow-right"></i>
+                    </span>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 glass-panel-hover space-y-3 cursor-pointer" onclick="switchTab('oracle')">
                     <div class="w-12 h-12 rounded-xl bg-mc-secondary/20 border border-mc-secondary/30 flex items-center justify-center text-mc-secondary text-xl">
                         <i class="fa-solid fa-brain"></i>
                     </div>
                     <h3 class="text-lg font-bold text-white font-display">AI Realm Oracle</h3>
-                    <p class="text-sm text-gray-400">Chat with the ancient S37 entity for server lore, crafting recipes, coordinates, and build ideas.</p>
-                    <button onclick="switchTab('oracle')" class="text-xs font-bold text-mc-secondary hover:underline inline-flex items-center gap-1">
-                        Launch Oracle <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                    <p class="text-xs text-gray-400 leading-relaxed">Попитай древния S37 Oracle за рецепти, редстоун механизми, идеи за бази или скрийншот анализ.</p>
+                    <span class="text-xs font-bold text-mc-secondary inline-flex items-center gap-1 pt-1">
+                        Питай Oracle <i class="fa-solid fa-arrow-right"></i>
+                    </span>
                 </div>
 
-                <div class="glass-panel p-6 rounded-2xl border border-white/5 glass-panel-hover transition space-y-3">
-                    <div class="w-12 h-12 rounded-xl bg-mc-accent/20 border border-mc-accent/30 flex items-center justify-center text-mc-accent text-xl">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-white font-display">Player Registration & Stats</h3>
-                    <p class="text-sm text-gray-400">Register your exact Minecraft username to claim your rank and sync your survival stats with the community.</p>
-                    <button onclick="switchTab('leaderboard')" class="text-xs font-bold text-mc-accent hover:underline inline-flex items-center gap-1">
-                        View Rankings <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-
-                <div class="glass-panel p-6 rounded-2xl border border-white/5 glass-panel-hover transition space-y-3">
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 glass-panel-hover space-y-3 cursor-pointer" onclick="switchTab('gallery')">
                     <div class="w-12 h-12 rounded-xl bg-mc-primary/20 border border-mc-primary/30 flex items-center justify-center text-mc-primary text-xl">
                         <i class="fa-solid fa-camera-retro"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white font-display">SMP Gallery & Lightbox</h3>
-                    <p class="text-sm text-gray-400">Browse pristine screenshots of mega bases, monument builds, and community events without broken links.</p>
-                    <button onclick="switchTab('gallery')" class="text-xs font-bold text-mc-primary hover:underline inline-flex items-center gap-1">
-                        View Gallery <i class="fa-solid fa-arrow-right"></i>
-                    </button>
+                    <h3 class="text-lg font-bold text-white font-display">SMP Галерия</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">Разгледай най-впечатляващите мега-бази, PvP турнири и монументи от Сезон 3.</p>
+                    <span class="text-xs font-bold text-mc-primary inline-flex items-center gap-1 pt-1">
+                        Разгледай <i class="fa-solid fa-arrow-right"></i>
+                    </span>
                 </div>
             </div>
         </section>
@@ -381,26 +442,26 @@
         </section>
 
         <!-- TAB 4: LEADERBOARD & REAL STATS REGISTRATION -->
-        <section id="tab-leaderboard" class="tab-content hidden space-y-6">
+        <section id="tab-leaderboard" class="tab-content hidden space-y-8">
             <!-- How It Works Banner & Info Matrix -->
-            <div class="glass-panel p-6 rounded-3xl border border-yellow-500/30 space-y-6 bg-gradient-to-br from-mc-panel/95 via-black/60 to-mc-panel/95 shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="glass-panel p-6 md:p-8 rounded-3xl border border-yellow-500/30 space-y-6 bg-gradient-to-br from-mc-panel/95 via-black/70 to-mc-panel/95 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-72 h-72 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
                     <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-500 to-amber-600 flex items-center justify-center text-black text-2xl font-black shadow-lg shadow-yellow-500/20 shrink-0">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-yellow-500 to-amber-500 flex items-center justify-center text-black text-2xl font-black shadow-lg gold-glow shrink-0">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-2xl md:text-3xl font-bold font-display text-white">S37 SMP Player Rankings & Quest Matrix</h2>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">SEASON 3 LIVE</span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-2xl md:text-3xl font-bold font-display text-white">S37 SMP Класация & Куест Матрица</h2>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">36 КУЕСТА АКТИВНИ</span>
                             </div>
-                            <p class="text-xs md:text-sm text-gray-300 mt-1">Регистрирай своя Minecraft IGN, отбележи завършените мисии и се изкачи в официалната стълбица на сървъра!</p>
+                            <p class="text-xs md:text-sm text-gray-300 mt-1">Регистрирай своя Minecraft IGN, отбележи завършените мисии и влез в Топ 3 на сървъра!</p>
                         </div>
                     </div>
-                    <button onclick="openRegisterModal()" class="btn-pixel bg-gradient-to-r from-yellow-500 to-amber-400 hover:from-yellow-400 hover:to-amber-300 text-black font-extrabold px-6 py-3.5 rounded-xl flex items-center gap-2 shadow-lg shadow-yellow-500/20 transition shrink-0 text-sm">
-                        <i class="fa-solid fa-user-gear text-base"></i>
+                    <button onclick="openRegisterModal()" class="btn-pixel bg-gradient-to-r from-yellow-500 to-amber-400 hover:from-yellow-400 hover:to-amber-300 text-black font-extrabold px-6 py-3.5 rounded-xl flex items-center gap-2 shadow-lg gold-glow shrink-0 text-xs md:text-sm">
+                        <i class="fa-solid fa-user-plus text-base"></i>
                         <span>Регистрирай / Обнови Профил</span>
                     </button>
                 </div>
@@ -410,35 +471,40 @@
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-start gap-3 hover:border-yellow-500/30 transition">
                         <span class="w-8 h-8 rounded-xl bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 font-bold flex items-center justify-center text-xs shrink-0">1</span>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">1. Въведи IGN</h4>
-                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Въведи точния си Minecraft псевдоним. Системата автоматично зарежда твоя 3D скин аватар.</p>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Въведи IGN</h4>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Въведи точния си Minecraft никнейм за автоматичен 3D аватар.</p>
                         </div>
                     </div>
 
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-start gap-3 hover:border-mc-primary/30 transition">
                         <span class="w-8 h-8 rounded-xl bg-mc-primary/20 border border-mc-primary/40 text-mc-primary font-bold flex items-center justify-center text-xs shrink-0">2</span>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">2. Избери Куестове</h4>
-                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Отбележи постиженията си (Ender Dragon, Mega Base, Iron Farm) и избери своя Minecraft Клас.</p>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">36 Сезонни Мисии</h4>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Филтрирай по категории и отбележи всички постижения, които си изпълнил.</p>
                         </div>
                     </div>
 
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-start gap-3 hover:border-mc-secondary/30 transition">
                         <span class="w-8 h-8 rounded-xl bg-mc-secondary/20 border border-mc-secondary/40 text-mc-secondary font-bold flex items-center justify-center text-xs shrink-0">3</span>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">3. Вземи SMP Coins</h4>
-                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Всеки куест ти дава Coins, XP Ниво и издига ранга ти (от Gold Novice до Mythic Overlord).</p>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Рангове & Coins</h4>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Издигни се от Gold Novice до S37 Immortal Legend с повече куестове.</p>
                         </div>
                     </div>
 
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-start gap-3 hover:border-mc-accent/30 transition">
                         <span class="w-8 h-8 rounded-xl bg-mc-accent/20 border border-mc-accent/40 text-mc-accent font-bold flex items-center justify-center text-xs shrink-0">4</span>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">4. Публично Досие</h4>
-                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Кликни върху който и да е играч в списъка, за да отвориш неговото пълно досие и значки.</p>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Топ 3 Подиум</h4>
+                            <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Първите трима играчи получават почетно място на подиума на славата.</p>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- TOP 3 PODIUM SECTION -->
+            <div id="top-3-podium" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end pt-4">
+                <!-- Populated dynamically via JS -->
             </div>
 
             <!-- Search, Filter & Stats Summary Bar -->
@@ -449,8 +515,9 @@
                 </div>
 
                 <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 text-xs">
-                    <span class="text-gray-400 shrink-0 font-bold"><i class="fa-solid fa-filter text-yellow-400"></i> Филтър по Ранг:</span>
+                    <span class="text-gray-400 shrink-0 font-bold"><i class="fa-solid fa-filter text-yellow-400"></i> Ранг:</span>
                     <button onclick="filterByRank('all')" id="rank-filter-all" class="rank-filter-btn px-3 py-1.5 rounded-lg bg-yellow-500 text-black font-bold transition shrink-0">Всички</button>
+                    <button onclick="filterByRank('Immortal')" id="rank-filter-Immortal" class="rank-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-rose-400 font-bold transition shrink-0">Immortal</button>
                     <button onclick="filterByRank('Mythic')" id="rank-filter-Mythic" class="rank-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-purple-400 font-bold transition shrink-0">Mythic</button>
                     <button onclick="filterByRank('Netherite')" id="rank-filter-Netherite" class="rank-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-400 font-bold transition shrink-0">Netherite</button>
                     <button onclick="filterByRank('Diamond')" id="rank-filter-Diamond" class="rank-filter-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-emerald-400 font-bold transition shrink-0">Diamond</button>
@@ -464,7 +531,7 @@
                     <table class="w-full text-left border-collapse min-w-[750px]">
                         <thead>
                             <tr class="bg-black/60 text-xs font-bold text-gray-400 uppercase border-b border-white/10 tracking-wider">
-                                <th class="p-4 text-center w-16">Ранг</th>
+                                <th class="p-4 text-center w-16">Място</th>
                                 <th class="p-4">Играч & Faction</th>
                                 <th class="p-4">Тиър & Клас</th>
                                 <th class="p-4">Завършени Куестове</th>
@@ -477,6 +544,75 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </section>
+
+        <!-- TAB: SERVER IDEAS & SUGGESTIONS HUB -->
+        <section id="tab-ideas" class="tab-content hidden space-y-8">
+            <div class="glass-panel p-6 md:p-8 rounded-3xl border border-amber-500/30 bg-gradient-to-br from-mc-panel/95 via-black/70 to-mc-panel/95 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-20 -right-20 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-black text-2xl font-black shadow-lg gold-glow shrink-0">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl md:text-3xl font-bold font-display text-white">Идеи и Предложения за S37</h2>
+                            <p class="text-xs md:text-sm text-gray-300 mt-1">Сподели своята идея за нови плъгини, ивенти или подобрения. Всички идеи се запазват в сайта!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Idea Form -->
+                <div class="mt-6 pt-6 border-t border-white/10 grid grid-cols-1 md:grid-cols-4 gap-4 relative z-10">
+                    <div class="space-y-1">
+                        <label class="block text-[11px] font-bold text-gray-400 uppercase">Твоят IGN (Автор):</label>
+                        <input type="text" id="idea-author-input" placeholder="напр. Steve" class="w-full bg-black/50 border border-white/10 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none font-mono">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[11px] font-bold text-gray-400 uppercase">Категория:</label>
+                        <select id="idea-category-input" class="w-full bg-black/50 border border-white/10 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none font-semibold">
+                            <option value="⚙️ Плъгини & Механики">⚙️ Плъгини & Механики</option>
+                            <option value="🎉 Ивенти & Турнири">🎉 Ивенти & Турнири</option>
+                            <option value="🏰 Строежи & Spawn">🏰 Строежи & Spawn</option>
+                            <option value="💰 Икономика & Магазини">💰 Икономика & Магазини</option>
+                            <option value="📜 Нови Куестове">📜 Нови Куестове</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1 md:col-span-2">
+                        <label class="block text-[11px] font-bold text-gray-400 uppercase">Заглавие на Идеята:</label>
+                        <input type="text" id="idea-title-input" placeholder="Кратко и ясно заглавие на предложението..." class="w-full bg-black/50 border border-white/10 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                    </div>
+                    <div class="space-y-1 md:col-span-3">
+                        <label class="block text-[11px] font-bold text-gray-400 uppercase">Подробно Описание:</label>
+                        <input type="text" id="idea-desc-input" placeholder="Опиши как точно ще работи и защо ще направи сървъра по-як..." class="w-full bg-black/50 border border-white/10 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="submitNewIdea()" class="w-full btn-pixel bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-black font-extrabold py-2.5 px-4 rounded-xl shadow-lg gold-glow text-xs flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Публикувай Идея
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter & Sort Bar for Ideas -->
+            <div class="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 rounded-2xl border border-white/10">
+                <div class="flex items-center gap-2 overflow-x-auto text-xs">
+                    <span class="text-gray-400 font-bold shrink-0"><i class="fa-solid fa-layer-group text-amber-400"></i> Филтър:</span>
+                    <button onclick="filterIdeas('all')" id="idea-cat-all" class="idea-cat-btn px-3 py-1.5 rounded-lg bg-amber-500 text-black font-bold transition shrink-0">Всички</button>
+                    <button onclick="filterIdeas('Плъгини')" id="idea-cat-Плъгини" class="idea-cat-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 font-semibold transition shrink-0">Плъгини</button>
+                    <button onclick="filterIdeas('Ивенти')" id="idea-cat-Ивенти" class="idea-cat-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 font-semibold transition shrink-0">Ивенти</button>
+                    <button onclick="filterIdeas('Строежи')" id="idea-cat-Строежи" class="idea-cat-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 font-semibold transition shrink-0">Строежи</button>
+                    <button onclick="filterIdeas('Икономика')" id="idea-cat-Икономика" class="idea-cat-btn px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 font-semibold transition shrink-0">Икономика</button>
+                </div>
+                <div class="text-xs text-gray-400">
+                    Общо предложения: <span id="ideas-total-count" class="text-amber-400 font-bold">0</span>
+                </div>
+            </div>
+
+            <!-- Ideas Grid -->
+            <div id="ideas-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated dynamically via JS -->
             </div>
         </section>
 
@@ -532,7 +668,7 @@
 
     <!-- Modal for Registering IGN & Selecting Quests -->
     <div id="register-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="relative max-w-2xl w-full glass-panel rounded-3xl p-6 border border-yellow-500/40 space-y-5 shadow-2xl my-8">
+        <div class="relative max-w-3xl w-full glass-panel rounded-3xl p-6 border border-yellow-500/40 space-y-5 shadow-2xl my-8">
             <div class="flex items-center justify-between border-b border-white/10 pb-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center text-yellow-400 text-xl font-bold">
@@ -540,7 +676,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold font-display text-white">Регистрация / Редакция на S37 Профил</h3>
-                        <p class="text-xs text-gray-400">Въведи твоя IGN и отбележи завършените мисии за автоматично изчисление.</p>
+                        <p class="text-xs text-gray-400">Въведи твоя IGN и отбележи завършените мисии от 36-те сезонни куеста.</p>
                     </div>
                 </div>
                 <button onclick="closeRegisterModal()" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition">
@@ -582,16 +718,26 @@
                 </div>
             </div>
 
-            <!-- Interactive Quest Checklist -->
-            <div class="space-y-2">
-                <div class="flex items-center justify-between">
+            <!-- Interactive Quest Checklist with Category Filter -->
+            <div class="space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
                     <label class="block text-xs font-bold text-yellow-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-check"></i> Завършени Сезонни Мисии (Отбележи взетите):
+                        <i class="fa-solid fa-list-check"></i> Завършени Сезонни Мисии (36 Куеста):
                     </label>
-                    <button onclick="toggleSelectAllQuests()" class="text-[11px] text-gray-400 hover:text-white underline">Избери всички</button>
+                    <div class="flex items-center gap-2">
+                        <select id="modal-quest-category-filter" onchange="renderQuestChecklist()" class="bg-black/60 border border-white/15 rounded-lg px-2.5 py-1 text-[11px] text-gray-200 outline-none">
+                            <option value="all">Всички Категории (36)</option>
+                            <option value="Combat">⚔️ Combat & Bosses</option>
+                            <option value="Building">🏰 Building & Mega-Bases</option>
+                            <option value="Redstone">⚙️ Redstone & Farms</option>
+                            <option value="Exploration">🧭 Exploration & Treasures</option>
+                            <option value="Economy">💰 Economy & Community</option>
+                        </select>
+                        <button onclick="toggleSelectAllQuests()" class="text-[11px] text-yellow-400 hover:underline font-semibold">Избери видимите</button>
+                    </div>
                 </div>
 
-                <div id="quest-checklist-container" class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-56 overflow-y-auto p-2 bg-black/40 rounded-2xl border border-white/10 text-xs">
+                <div id="quest-checklist-container" class="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto p-2.5 bg-black/50 rounded-2xl border border-white/10 text-xs">
                     <!-- Checkboxes populated via JavaScript -->
                 </div>
             </div>
@@ -600,7 +746,7 @@
             <div class="bg-gradient-to-r from-yellow-500/10 via-emerald-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div>
                     <span class="text-gray-400 block text-[10px] uppercase font-bold">Изчислени Мисии</span>
-                    <span id="preview-quests-count" class="text-lg font-bold text-emerald-400 font-display">0 / 10</span>
+                    <span id="preview-quests-count" class="text-lg font-bold text-emerald-400 font-display">0 / 36</span>
                 </div>
                 <div>
                     <span class="text-gray-400 block text-[10px] uppercase font-bold">Изчислени Coins</span>
@@ -614,7 +760,7 @@
 
             <div class="flex justify-end gap-3 border-t border-white/10 pt-4">
                 <button onclick="closeRegisterModal()" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold transition">Отказ</button>
-                <button onclick="submitPlayerRegistration()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-400 hover:from-yellow-400 hover:to-amber-300 text-black font-extrabold text-xs shadow-lg shadow-yellow-500/20 transition">Запази Профила</button>
+                <button onclick="submitPlayerRegistration()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-400 hover:from-yellow-400 hover:to-amber-300 text-black font-extrabold text-xs shadow-lg gold-glow transition">Запази Профила</button>
             </div>
         </div>
     </div>
@@ -700,21 +846,57 @@
         let userApiKey = localStorage.getItem('S37_VAULT_GEMINI_KEY') || '';
         let selectedOracleImageBase64 = null;
 
-        // Season 3 Master Quest List with individual rewards
+        // Expanded Season 3 Master Quest List (36 Quests across 5 Categories)
         const S37_QUESTS_MASTER = [
-            { id: 'dragon', title: '🐉 Победен Ender Dragon', coins: 1500, desc: 'Участие в битката за убиването на дракона' },
-            { id: 'megabase', title: '🏰 Изградена Mega Base (>100k blocks)', coins: 1200, desc: 'Изграден монументален комплекс в кубчета' },
-            { id: 'ironfarm', title: '⚙️ Автоматизирана Iron / Gold Farm', coins: 800, desc: 'Работеща редстоун ферма в реално време' },
-            { id: 'netherite', title: '🛡️ Пълен Комплект Netherite Armor', coins: 700, desc: 'Максимално подобрена броня с енчанти' },
-            { id: 'debris', title: '💎 Изкопани 500+ Ancient Debris', coins: 600, desc: 'Дълбоко копаене в Nether измерението' },
-            { id: 'elytra', title: '🚀 Мастър Полет с Elytra', coins: 500, desc: 'Намерена Елитра & изградена фойерверк фабрика' },
-            { id: 'shop', title: '🏪 Собствен Магазин на Spawn Market', coins: 450, desc: 'Търговска точка с chest shops' },
-            { id: 'beacon', title: '🧪 Максимална Beacon Станция (Level 4)', coins: 400, desc: 'Активиран маек в централната база' },
-            { id: 'monument', title: '🌊 Превзет Ocean Monument', coins: 350, desc: 'Убити Elder Guardians & почистен спондж' },
-            { id: 'lore', title: '📜 Завършен S37 Lore Quest', coins: 300, desc: 'Разкрити тайните на Древния Oracle' }
+            // COMBAT & BOSSES (8)
+            { id: 'dragon', category: 'Combat', title: '🐉 Убиец на Ender Dragon', coins: 1500, desc: 'Победен Ender Dragon в The End' },
+            { id: 'wither', category: 'Combat', title: '💀 Повелител на Wither', coins: 1200, desc: 'Призован и победен Wither Boss' },
+            { id: 'warden', category: 'Combat', title: '🔊 Ловец на Warden', coins: 1600, desc: 'Победен Warden в Deep Dark' },
+            { id: 'monument', category: 'Combat', title: '🌊 Превзет Ocean Monument', coins: 850, desc: 'Убити 3-мата Elder Guardians' },
+            { id: 'raid_hero', category: 'Combat', title: '🛡️ Hero of the Village (Lvl 5)', coins: 750, desc: 'Защитено село от максимален Raid' },
+            { id: 'netherite_armor', category: 'Combat', title: '⚔️ Пълен Netherite Сет', coins: 900, desc: 'Full Netherite броня и меч с енчанти' },
+            { id: 'pvp_champ', category: 'Combat', title: '🏆 S37 Арена Шампион', coins: 1100, desc: 'Спечелен турнир на сървърната арена' },
+            { id: 'wither_skulls', category: 'Combat', title: '🦴 Колекционер на Черепи', coins: 600, desc: 'Събрани 15+ Wither Skeleton Skulls' },
+
+            // BUILDING & MEGA-BASES (7)
+            { id: 'megabase', category: 'Building', title: '🏰 Архитект на Mega Base', coins: 1500, desc: 'Изградена база с над 100,000 блока' },
+            { id: 'spawn_build', category: 'Building', title: '🏛️ Строител на Spawn', coins: 1000, desc: 'Участие в изграждането на централния Spawn' },
+            { id: 'nether_hub', category: 'Building', title: '🚇 Nether Магистрала & Хъб', coins: 800, desc: 'Свързана база с леден тунел в Nether' },
+            { id: 'map_art', category: 'Building', title: '🎨 Създател на Map Art', coins: 950, desc: 'Изработена картина 128x128 върху карта' },
+            { id: 'castle_walls', category: 'Building', title: '🧱 Укрепена Крепост', coins: 650, desc: 'Изградени стени, кули и защитен ров' },
+            { id: 'underwater_dome', category: 'Building', title: '🫧 Подводен Купол', coins: 850, desc: 'Изградена подводна стъклена база' },
+            { id: 'sky_island', category: 'Building', title: '☁️ Летящ Остров', coins: 900, desc: 'Изграден персонализиран остров в небето' },
+
+            // REDSTONE & FARMS (7)
+            { id: 'ironfarm', category: 'Redstone', title: '⚙️ Индустриална Iron Farm', coins: 900, desc: 'Автоматична ферма за желязо 24/7' },
+            { id: 'goldfarm', category: 'Redstone', title: '🪙 Nether Gold & XP Farm', coins: 1100, desc: 'Високоефективна ферма на покрива на Nether' },
+            { id: 'raid_farm', category: 'Redstone', title: '🧪 Автоматична Raid Farm', coins: 1300, desc: 'Ферма за Totems of Undying и Emeralds' },
+            { id: 'storage_system', category: 'Redstone', title: '📦 Автоматичен Склад (Sorter)', coins: 1000, desc: 'Редстоун сортировач за 100+ предмета' },
+            { id: 'creeper_farm', category: 'Redstone', title: '🧨 Gunpowder / Creeper Farm', coins: 750, desc: 'Непрекъснато производство на барут' },
+            { id: 'trading_hall', category: 'Redstone', title: '🧑‍🌾 Villager Trading Hall', coins: 850, desc: 'Зала с 20+ зомбифицирани търговци' },
+            { id: 'guardian_farm', category: 'Redstone', title: '🔱 Guardian XP & Prismarine Farm', coins: 1400, desc: 'Пресушен монумент с работеща ферма' },
+
+            // EXPLORATION & TREASURES (7)
+            { id: 'elytra', category: 'Exploration', title: '🚀 Първи Полет с Elytra', coins: 700, desc: 'Намерена Елитра от End Ship' },
+            { id: 'ancient_city', category: 'Exploration', title: '🕯️ Изследовател на Ancient City', coins: 800, desc: 'Плячкосан древен град и намерен Silence Trim' },
+            { id: 'debris_miner', category: 'Exploration', title: '💎 Миньор на Ancient Debris', coins: 850, desc: 'Изкопани над 250 блока Ancient Debris' },
+            { id: 'trial_chamber', category: 'Exploration', title: '🗝️ Покорител на Trial Chambers', coins: 950, desc: 'Отключен Ominous Vault и намерен Heavy Core' },
+            { id: 'all_biomes', category: 'Exploration', title: '🌍 Пътешественик (Adventuring Time)', coins: 1000, desc: 'Посетени всички биоми в света' },
+            { id: 'sniffer_egg', category: 'Exploration', title: '🦕 Археолог (Sniffer & Torchflower)', coins: 550, desc: 'Излюпен Sniffer от Ocean Ruins' },
+            { id: 'heart_sea', category: 'Exploration', title: '💙 Активиран Conduit', coins: 500, desc: 'Сглобен и активиран подводен Conduit' },
+
+            // ECONOMY & COMMUNITY (7)
+            { id: 'spawn_shop', category: 'Economy', title: '🏪 Собствен Магазин на Spawn', coins: 650, desc: 'Открит активен магазин в търговския квартал' },
+            { id: 'beacon_lvl4', category: 'Economy', title: '✨ Пълен Beacon (Level 4)', coins: 750, desc: 'Пирамида от 164 блока за максимален Beacon' },
+            { id: 'netherite_beacon', category: 'Economy', title: '👑 Легендарен Netherite Beacon', coins: 2500, desc: 'Върховното постижение на богатството в S37' },
+            { id: 'diamond_stack', category: 'Economy', title: '💠 Милионер (10+ Stacks Diamonds)', coins: 1100, desc: 'Натрупани над 640 диаманта' },
+            { id: 'event_host', category: 'Economy', title: '🎪 Организатор на Мини-Игра', coins: 800, desc: 'Създадена арена или игра за общността' },
+            { id: 'lore_quest', category: 'Economy', title: '📜 Пазител на S37 Lore', coins: 500, desc: 'Разкрити тайните на Древния Oracle' },
+            { id: 'helper_badge', category: 'Economy', title: '🤝 Помощник на Новаци', coins: 450, desc: 'Осигурен стартов екип за нови играчи' }
         ];
 
         let selectedFilterRank = 'all';
+        let selectedModalCheckboxes = new Set();
 
         // Rich Default / Saved Player Leaderboard
         let leaderboardPlayers = JSON.parse(localStorage.getItem('S37_LEADERBOARD_PLAYERS')) || [
@@ -722,82 +904,57 @@
                 ign: 'EnderLord_99', 
                 playerClass: '⚔️ PvP Warrior', 
                 faction: 'Ender Syndicate',
-                questsCompleted: ['dragon', 'megabase', 'ironfarm', 'netherite', 'debris', 'elytra', 'beacon'],
-                coins: 5700,
-                level: 68,
-                playtime: '142 hrs'
+                questsCompleted: ['dragon', 'wither', 'warden', 'megabase', 'ironfarm', 'goldfarm', 'netherite_armor', 'elytra', 'beacon_lvl4', 'pvp_champ']
             },
             { 
                 ign: 'VortexKnight', 
                 playerClass: '🏗️ Mega Builder', 
                 faction: 'Emerald Guild',
-                questsCompleted: ['megabase', 'ironfarm', 'netherite', 'shop', 'lore'],
-                coins: 3450,
-                level: 45,
-                playtime: '118 hrs'
+                questsCompleted: ['dragon', 'megabase', 'spawn_build', 'nether_hub', 'map_art', 'ironfarm', 'elytra', 'spawn_shop']
             },
             { 
                 ign: 'RedstoneCraft', 
                 playerClass: '⚡ Redstoneer', 
                 faction: 'Automata Clan',
-                questsCompleted: ['ironfarm', 'netherite', 'elytra', 'beacon'],
-                coins: 2400,
-                level: 32,
-                playtime: '95 hrs'
+                questsCompleted: ['ironfarm', 'goldfarm', 'raid_farm', 'storage_system', 'trading_hall', 'elytra', 'beacon_lvl4']
             }
         ];
 
-        /* Sound FX Engine */
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        let audioCtxInstance = null;
-
-        function playMinecraftSound(type) {
-            if (!audioEnabled) return;
-            try {
-                if (!audioCtxInstance) audioCtxInstance = new AudioCtx();
-                const ctx = audioCtxInstance;
-                if (ctx.state === 'suspended') ctx.resume();
-
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                const now = ctx.currentTime;
-
-                if (type === 'click') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(600, now);
-                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                    osc.start(now);
-                    osc.stop(now + 0.05);
-                } else if (type === 'xp') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(880, now);
-                    osc.frequency.setValueAtTime(1760, now + 0.08);
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                    osc.start(now);
-                    osc.stop(now + 0.2);
-                }
-            } catch (e) {
-                console.log("Audio suppressed:", e);
+        // Server Ideas State (Persisted in localStorage)
+        let serverIdeas = JSON.parse(localStorage.getItem('S37_SERVER_IDEAS')) || [
+            {
+                id: 'idea-1',
+                author: 'EnderLord_99',
+                category: '🎉 Ивенти & Турнири',
+                title: 'Седмичен End Dragon & Elytra Race Турнир',
+                desc: 'Всяка събота вечер да се организира състезание с Елитри през пръстени в небето с награди в SMP Coins.',
+                votes: 18,
+                voted: false,
+                date: 'Преди 2 дни'
+            },
+            {
+                id: 'idea-2',
+                author: 'VortexKnight',
+                category: '🏰 Строежи & Spawn',
+                title: 'Разширение на Търговския Квартал на Spawn',
+                desc: 'Да добавим нов остров с портал за магазини на играчите, за да има повече място за нови търговци.',
+                votes: 14,
+                voted: false,
+                date: 'Преди 1 ден'
+            },
+            {
+                id: 'idea-3',
+                author: 'RedstoneCraft',
+                category: '⚙️ Плъгини & Механики',
+                title: 'Динамична Уеб Карта (Dynmap / BlueMap)',
+                desc: 'Интегриране на 3D карта на света в реално време, за да виждаме къде се намират базите и пътищата.',
+                votes: 24,
+                voted: false,
+                date: 'Днес'
             }
-        }
+        ];
 
-        function toggleAudio() {
-            audioEnabled = !audioEnabled;
-            const icon = document.getElementById('sound-icon');
-            if (audioEnabled) {
-                icon.className = 'fa-solid fa-volume-high';
-                showToast("Sound effects enabled!", "info");
-            } else {
-                icon.className = 'fa-solid fa-volume-xmark';
-                showToast("Sound effects muted.", "info");
-            }
-        }
-
+        let selectedIdeaCategory = 'all';
         function switchTab(tabId) {
             playMinecraftSound('click');
             activeTab = tabId;
@@ -806,19 +963,21 @@
             if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('.nav-tab').forEach(btn => {
-                btn.className = 'nav-tab px-4 py-2 rounded-lg text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition flex items-center gap-2';
+                btn.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 transition flex items-center gap-2 shrink-0';
             });
             const activeBtn = document.getElementById('tab-btn-' + tabId);
             if (activeBtn) {
-                activeBtn.className = 'nav-tab px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 bg-mc-primary text-black font-bold';
+                activeBtn.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-mc-primary text-black shadow-md shrink-0';
             }
             if (tabId === 'leaderboard') renderLeaderboard();
+            if (tabId === 'ideas') renderIdeas();
         }
 
         function calculatePlayerTier(coinsCount) {
-            if (coinsCount >= 5000) return { name: 'Mythic Overlord', badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/40' };
-            if (coinsCount >= 3000) return { name: 'Netherite Champion', badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' };
-            if (coinsCount >= 1500) return { name: 'Diamond Survivor', badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
+            if (coinsCount >= 15000) return { name: 'S37 Immortal Legend', badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+            if (coinsCount >= 9000) return { name: 'Mythic Overlord', badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/40' };
+            if (coinsCount >= 5000) return { name: 'Netherite Champion', badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40' };
+            if (coinsCount >= 2000) return { name: 'Diamond Survivor', badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' };
             return { name: 'Gold Novice', badgeClass: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' };
         }
 
@@ -841,6 +1000,84 @@
             renderLeaderboard();
         }
 
+        function renderTop3Podium(sortedPlayers) {
+            const podiumContainer = document.getElementById('top-3-podium');
+            if (!podiumContainer) return;
+
+            if (sortedPlayers.length === 0) {
+                podiumContainer.innerHTML = '';
+                return;
+            }
+
+            // Order for visual podium: #2 (Silver - Left), #1 (Gold - Center Elevated), #3 (Bronze - Right)
+            const orderIndices = [1, 0, 2];
+            const styles = {
+                0: {
+                    medal: '👑 #1 ШАМПИОН',
+                    border: 'border-yellow-400/60 gold-glow',
+                    bg: 'bg-gradient-to-b from-yellow-500/20 via-mc-panel to-mc-panel',
+                    text: 'text-yellow-400',
+                    height: 'md:pb-8 md:-translate-y-3',
+                    avatarSize: 'w-20 h-20'
+                },
+                1: {
+                    medal: '🥈 #2 ВИЦЕШАМПИОН',
+                    border: 'border-slate-300/40',
+                    bg: 'bg-gradient-to-b from-slate-400/15 via-mc-panel to-mc-panel',
+                    text: 'text-slate-200',
+                    height: '',
+                    avatarSize: 'w-16 h-16'
+                },
+                2: {
+                    medal: '🥉 #3 БРОНЗОВ МЕДАЛ',
+                    border: 'border-amber-600/40',
+                    bg: 'bg-gradient-to-b from-amber-600/15 via-mc-panel to-mc-panel',
+                    text: 'text-amber-500',
+                    height: '',
+                    avatarSize: 'w-16 h-16'
+                }
+            };
+
+            podiumContainer.innerHTML = '';
+
+            orderIndices.forEach(idx => {
+                const p = sortedPlayers[idx];
+                if (!p) return;
+                const st = styles[idx];
+                const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(p.ign)}/80`;
+                const questCount = (p.questsCompleted || []).length;
+
+                const card = document.createElement('div');
+                card.className = `glass-panel ${st.bg} border ${st.border} ${st.height} rounded-3xl p-6 text-center relative transition-all duration-300 hover:scale-[1.02] cursor-pointer shadow-xl`;
+                card.onclick = () => openPlayerDossier(p.ign);
+
+                card.innerHTML = `
+                    <div class="inline-block px-3 py-1 rounded-full bg-black/60 border border-white/10 text-[11px] font-extrabold ${st.text} mb-4 tracking-wider">
+                        ${st.medal}
+                    </div>
+                    <div class="relative mx-auto ${st.avatarSize} mb-3 animate-float">
+                        <img src="${avatarUrl}" alt="${escapeHtml(p.ign)}" class="w-full h-full rounded-2xl border-2 border-white/20 shadow-lg object-contain bg-black/50" onerror="this.src='https://placehold.co/80x80/10b981/ffffff?text=MC'">
+                    </div>
+                    <h3 class="text-lg font-display font-black text-white truncate">${escapeHtml(p.ign)}</h3>
+                    <p class="text-xs text-gray-400 mb-3">${escapeHtml(p.faction || 'Solo Survivalist')}</p>
+                    <div class="inline-block px-2.5 py-0.5 rounded-md border text-[10px] font-bold mb-4 ${p.tier.badgeClass}">
+                        ${p.tier.name}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-xs">
+                        <div class="bg-black/40 p-2 rounded-xl">
+                            <span class="text-[10px] text-gray-400 block">Coins</span>
+                            <span class="font-bold text-yellow-400 font-display">${p.calculatedCoins.toLocaleString()} 🪙</span>
+                        </div>
+                        <div class="bg-black/40 p-2 rounded-xl">
+                            <span class="text-[10px] text-gray-400 block">Куестове</span>
+                            <span class="font-bold text-emerald-400">${questCount} / ${S37_QUESTS_MASTER.length}</span>
+                        </div>
+                    </div>
+                `;
+                podiumContainer.appendChild(card);
+            });
+        }
+
         function renderLeaderboard() {
             const tbody = document.getElementById('leaderboard-tbody');
             if (!tbody) return;
@@ -850,19 +1087,19 @@
             // Calculate total coins & sort descending
             leaderboardPlayers.forEach(p => {
                 if (typeof p.questsCompleted === 'number') {
-                    // Fallback for old simple data structure
                     p.questsCompleted = S37_QUESTS_MASTER.slice(0, p.questsCompleted).map(q => q.id);
                 }
                 const questArray = Array.isArray(p.questsCompleted) ? p.questsCompleted : [];
                 p.calculatedCoins = questArray.reduce((acc, qId) => {
                     const found = S37_QUESTS_MASTER.find(m => m.id === qId);
-                    return acc + (found ? found.coins : 200);
+                    return acc + (found ? found.coins : 300);
                 }, 0);
                 p.tier = calculatePlayerTier(p.calculatedCoins);
-                p.level = Math.floor(p.calculatedCoins / 80) + 5;
+                p.level = Math.floor(p.calculatedCoins / 100) + 5;
             });
 
             leaderboardPlayers.sort((a, b) => b.calculatedCoins - a.calculatedCoins);
+            renderTop3Podium(leaderboardPlayers);
 
             let filtered = leaderboardPlayers.filter(p => {
                 const matchesSearch = p.ign.toLowerCase().includes(searchVal) || (p.faction || '').toLowerCase().includes(searchVal);
@@ -884,11 +1121,12 @@
             }
 
             filtered.forEach((p, index) => {
-                let rankDisplay = `#${index + 1}`;
+                const globalRank = leaderboardPlayers.findIndex(item => item.ign === p.ign);
+                let rankDisplay = `#${globalRank + 1}`;
                 let rankColor = 'text-gray-400';
-                if (index === 0) { rankDisplay = '🥇 #1'; rankColor = 'text-yellow-400 font-extrabold text-base'; }
-                if (index === 1) { rankDisplay = '🥈 #2'; rankColor = 'text-gray-200 font-extrabold text-base'; }
-                if (index === 2) { rankDisplay = '🥉 #3'; rankColor = 'text-amber-500 font-extrabold text-base'; }
+                if (globalRank === 0) { rankDisplay = '🥇 #1'; rankColor = 'text-yellow-400 font-extrabold text-base'; }
+                if (globalRank === 1) { rankDisplay = '🥈 #2'; rankColor = 'text-gray-200 font-extrabold text-base'; }
+                if (globalRank === 2) { rankDisplay = '🥉 #3'; rankColor = 'text-amber-500 font-extrabold text-base'; }
 
                 const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(p.ign)}/40`;
                 const questCount = (p.questsCompleted || []).length;
@@ -904,7 +1142,7 @@
                     <td class="p-4 text-center font-bold ${rankColor}">${rankDisplay}</td>
                     <td class="p-4">
                         <div class="flex items-center gap-3">
-                            <img src="${avatarUrl}" alt="${escapeHtml(p.ign)}" class="w-9 h-9 rounded-xl bg-black/50 border border-white/10 object-contain shrink-0 group-hover:scale-105 transition" onerror="this.src='https://placehold.co/40x40/10b981/ffffff?text=MC'">
+                            <img src="${avatarUrl}" alt="${escapeHtml(p.ign)}" class="w-10 h-10 rounded-xl bg-black/50 border border-white/10 object-contain shrink-0 group-hover:scale-105 transition" onerror="this.src='https://placehold.co/40x40/10b981/ffffff?text=MC'">
                             <div>
                                 <div class="font-bold text-white group-hover:text-yellow-400 transition flex items-center gap-1.5">
                                     <span>${escapeHtml(p.ign)}</span>
@@ -923,8 +1161,8 @@
                     <td class="p-4">
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-emerald-400">${questCount} / ${S37_QUESTS_MASTER.length}</span>
-                            <div class="w-16 h-1.5 rounded-full bg-black/50 overflow-hidden border border-white/10 hidden sm:block">
-                                <div class="h-full bg-emerald-400 rounded-full" style="width: ${(questCount / S37_QUESTS_MASTER.length) * 100}%"></div>
+                            <div class="w-20 h-2 rounded-full bg-black/60 overflow-hidden border border-white/10 hidden sm:block">
+                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-300 rounded-full" style="width: ${(questCount / S37_QUESTS_MASTER.length) * 100}%"></div>
                             </div>
                         </div>
                     </td>
@@ -933,7 +1171,7 @@
                         <span class="text-[10px] text-purple-400 font-bold">Level ${p.level} XP</span>
                     </td>
                     <td class="p-4 text-right">
-                        <button onclick="openPlayerDossier('${escapeHtml(p.ign)}')" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-gray-300 hover:text-white border border-white/10 text-xs font-bold transition inline-flex items-center gap-1">
+                        <button onclick="openPlayerDossier('${escapeHtml(p.ign)}')" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-yellow-500 hover:text-black text-gray-300 border border-white/10 text-xs font-bold transition inline-flex items-center gap-1.5">
                             <span>Досие</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
                         </button>
                     </td>
@@ -944,6 +1182,8 @@
 
         function openRegisterModal() {
             playMinecraftSound('click');
+            selectedModalCheckboxes.clear();
+            document.getElementById('modal-quest-category-filter').value = 'all';
             renderQuestChecklist();
             document.getElementById('register-modal').classList.remove('hidden');
             updateModalAvatarPreview();
@@ -954,19 +1194,37 @@
             document.getElementById('register-modal').classList.add('hidden');
         }
 
+        function toggleQuestSelection(questId, isChecked) {
+            if (isChecked) {
+                selectedModalCheckboxes.add(questId);
+            } else {
+                selectedModalCheckboxes.delete(questId);
+            }
+            recalculateModalScore();
+        }
+
         function renderQuestChecklist() {
             const container = document.getElementById('quest-checklist-container');
             if (!container) return;
 
+            const catFilter = document.getElementById('modal-quest-category-filter')?.value || 'all';
+            const filteredQuests = catFilter === 'all' 
+                ? S37_QUESTS_MASTER 
+                : S37_QUESTS_MASTER.filter(q => q.category === catFilter);
+
             container.innerHTML = '';
-            S37_QUESTS_MASTER.forEach(q => {
+            filteredQuests.forEach(q => {
+                const isChecked = selectedModalCheckboxes.has(q.id);
                 const label = document.createElement('label');
-                label.className = 'flex items-start gap-2.5 p-2 rounded-xl bg-black/30 hover:bg-white/5 border border-white/5 cursor-pointer transition select-none';
+                label.className = `flex items-start gap-2.5 p-2.5 rounded-xl border cursor-pointer transition select-none ${isChecked ? 'bg-yellow-500/15 border-yellow-500/40' : 'bg-black/40 hover:bg-white/5 border-white/5'}`;
                 label.innerHTML = `
-                    <input type="checkbox" value="${q.id}" onchange="recalculateModalScore()" class="quest-checkbox mt-0.5 rounded border-gray-600 text-yellow-500 focus:ring-0">
-                    <div class="overflow-hidden">
-                        <div class="font-bold text-white text-[11px] truncate">${q.title}</div>
-                        <div class="text-[10px] text-gray-400 font-mono">+${q.coins} Coins</div>
+                    <input type="checkbox" value="${q.id}" ${isChecked ? 'checked' : ''} onchange="toggleQuestSelection('${q.id}', this.checked); renderQuestChecklist();" class="quest-checkbox mt-0.5 rounded border-gray-600 text-yellow-500 focus:ring-0">
+                    <div class="overflow-hidden flex-grow">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="font-bold text-white text-[11px] truncate">${q.title}</span>
+                            <span class="text-[10px] text-yellow-400 font-mono font-bold shrink-0">+${q.coins}</span>
+                        </div>
+                        <div class="text-[10px] text-gray-400 truncate mt-0.5">${q.desc}</div>
                     </div>
                 `;
                 container.appendChild(label);
@@ -974,9 +1232,20 @@
         }
 
         function toggleSelectAllQuests() {
-            const boxes = document.querySelectorAll('.quest-checkbox');
-            const allChecked = Array.from(boxes).every(b => b.checked);
-            boxes.forEach(b => b.checked = !allChecked);
+            const catFilter = document.getElementById('modal-quest-category-filter')?.value || 'all';
+            const visibleQuests = catFilter === 'all' 
+                ? S37_QUESTS_MASTER 
+                : S37_QUESTS_MASTER.filter(q => q.category === catFilter);
+
+            const allVisibleSelected = visibleQuests.every(q => selectedModalCheckboxes.has(q.id));
+            visibleQuests.forEach(q => {
+                if (allVisibleSelected) {
+                    selectedModalCheckboxes.delete(q.id);
+                } else {
+                    selectedModalCheckboxes.add(q.id);
+                }
+            });
+            renderQuestChecklist();
             recalculateModalScore();
         }
 
@@ -986,15 +1255,24 @@
             const lbl = document.getElementById('modal-avatar-label');
             if (img) img.src = `https://mc-heads.net/avatar/${encodeURIComponent(ign)}/50`;
             if (lbl) lbl.innerText = ign;
+
+            // Pre-load existing player quests if IGN matches
+            const existing = leaderboardPlayers.find(p => p.ign.toLowerCase() === ign.toLowerCase());
+            if (existing && Array.isArray(existing.questsCompleted)) {
+                selectedModalCheckboxes = new Set(existing.questsCompleted);
+                document.getElementById('reg-class-input').value = existing.playerClass || '⚔️ PvP Warrior';
+                document.getElementById('reg-faction-input').value = existing.faction || '';
+                renderQuestChecklist();
+                recalculateModalScore();
+            }
         }
 
         function recalculateModalScore() {
-            const checkedBoxes = document.querySelectorAll('.quest-checkbox:checked');
-            const count = checkedBoxes.length;
+            const count = selectedModalCheckboxes.size;
             let totalCoins = 0;
 
-            checkedBoxes.forEach(box => {
-                const found = S37_QUESTS_MASTER.find(q => q.id === box.value);
+            selectedModalCheckboxes.forEach(qId => {
+                const found = S37_QUESTS_MASTER.find(q => q.id === qId);
                 if (found) totalCoins += found.coins;
             });
 
@@ -1021,8 +1299,7 @@
                 return;
             }
 
-            const checkedBoxes = document.querySelectorAll('.quest-checkbox:checked');
-            const selectedQuestIds = Array.from(checkedBoxes).map(b => b.value);
+            const selectedQuestIds = Array.from(selectedModalCheckboxes);
 
             const existing = leaderboardPlayers.find(p => p.ign.toLowerCase() === ign.toLowerCase());
             if (existing) {
@@ -1034,8 +1311,7 @@
                     ign: ign,
                     playerClass: classInput.value,
                     faction: factionInput.value.trim() || 'Solo Survivalist',
-                    questsCompleted: selectedQuestIds,
-                    playtime: '12 hrs'
+                    questsCompleted: selectedQuestIds
                 });
             }
 
@@ -1045,6 +1321,177 @@
             playMinecraftSound('xp');
             showToast(`Успешно запазен профил за ${ign}!`, "success");
             ignInput.value = '';
+        }
+
+        /* Server Ideas & Suggestions Engine */
+        function filterIdeas(cat) {
+            playMinecraftSound('click');
+            selectedIdeaCategory = cat;
+            document.querySelectorAll('.idea-cat-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-black', 'font-bold');
+                btn.classList.add('bg-white/5', 'text-gray-300', 'font-semibold');
+            });
+            const active = document.getElementById('idea-cat-' + cat);
+            if (active) {
+                active.classList.add('bg-amber-500', 'text-black', 'font-bold');
+                active.classList.remove('bg-white/5', 'text-gray-300', 'font-semibold');
+            }
+            renderIdeas();
+        }
+
+        function renderIdeas() {
+            const grid = document.getElementById('ideas-grid');
+            const countEl = document.getElementById('ideas-total-count');
+            if (!grid) return;
+
+            const sortedIdeas = [...serverIdeas].sort((a, b) => b.votes - a.votes);
+            const filtered = selectedIdeaCategory === 'all'
+                ? sortedIdeas
+                : sortedIdeas.filter(item => item.category.includes(selectedIdeaCategory));
+
+            if (countEl) countEl.innerText = filtered.length;
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 text-xs">Няма идеи в тази категория. Бъди първият, който ще предложи нещо!</div>`;
+                return;
+            }
+
+            filtered.forEach(idea => {
+                const avatarUrl = `https://mc-heads.net/avatar/${encodeURIComponent(idea.author)}/32`;
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-6 rounded-2xl border border-white/10 glass-panel-hover flex flex-col justify-between gap-4';
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">
+                                ${escapeHtml(idea.category)}
+                            </span>
+                            <span class="text-[10px] text-gray-500">${escapeHtml(idea.date || 'Ново')}</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white font-display leading-snug">${escapeHtml(idea.title)}</h3>
+                        <p class="text-xs text-gray-300 leading-relaxed">${escapeHtml(idea.desc)}</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2">
+                            <img src="${avatarUrl}" alt="${escapeHtml(idea.author)}" class="w-6 h-6 rounded-md bg-black/50" onerror="this.src='https://placehold.co/32x32/f59e0b/000000?text=MC'">
+                            <span class="text-xs font-bold text-gray-300">${escapeHtml(idea.author)}</span>
+                        </div>
+
+                        <button onclick="upvoteIdea('${idea.id}')" class="px-3 py-1.5 rounded-xl border text-xs font-extrabold flex items-center gap-1.5 transition ${idea.voted ? 'bg-amber-500 text-black border-amber-400 shadow-md' : 'bg-white/5 hover:bg-white/15 text-amber-400 border-white/10'}">
+                            <i class="fa-solid fa-arrow-up"></i>
+                            <span>${idea.votes}</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function submitNewIdea() {
+            const authorInput = document.getElementById('idea-author-input');
+            const categoryInput = document.getElementById('idea-category-input');
+            const titleInput = document.getElementById('idea-title-input');
+            const descInput = document.getElementById('idea-desc-input');
+
+            const author = authorInput.value.trim() || 'Анонимен Играч';
+            const title = titleInput.value.trim();
+            const desc = descInput.value.trim();
+
+            if (!title || !desc) {
+                showToast("Моля, попълни заглавие и описание на идеята!", "error");
+                return;
+            }
+
+            const newIdea = {
+                id: 'idea-' + Date.now(),
+                author: author,
+                category: categoryInput.value,
+                title: title,
+                desc: desc,
+                votes: 1,
+                voted: true,
+                date: 'Току-що'
+            };
+
+            serverIdeas.unshift(newIdea);
+            localStorage.setItem('S37_SERVER_IDEAS', JSON.stringify(serverIdeas));
+
+            titleInput.value = '';
+            descInput.value = '';
+            playMinecraftSound('xp');
+            showToast("Твоята идея беше публикувана успешно!", "success");
+            renderIdeas();
+        }
+
+        function upvoteIdea(ideaId) {
+            const idea = serverIdeas.find(i => i.id === ideaId);
+            if (!idea) return;
+
+            playMinecraftSound('click');
+            if (idea.voted) {
+                idea.votes = Math.max(0, idea.votes - 1);
+                idea.voted = false;
+            } else {
+                idea.votes += 1;
+                idea.voted = true;
+            }
+
+            localStorage.setItem('S37_SERVER_IDEAS', JSON.stringify(serverIdeas));
+            renderIdeas();
+        }
+
+        /* Web Audio API Sound Effects Engine */
+        let audioCtx = null;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (icon) {
+                icon.className = audioEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-red-400';
+            }
+            showToast(audioEnabled ? "Звуковите ефекти са включени" : "Звуковите ефекти са изключени", "info");
+        }
+
+        function playMinecraftSound(type) {
+            if (!audioEnabled) return;
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'click') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'xp') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.setValueAtTime(880, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                }
+            } catch (e) {
+                // Ignore audio autoplay restrictions
+            }
         }
 
         function openPlayerDossier(ign) {
@@ -1437,6 +1884,7 @@
             initParticles();
             initVaultState();
             renderLeaderboard();
+            renderIdeas();
             fetchLiveServerStatus();
             // Обновяване на статуса на всеки 30 секунди
             setInterval(fetchLiveServerStatus, 30000);
