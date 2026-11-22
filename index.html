@@ -257,7 +257,7 @@
                         <div class="w-10 h-10 rounded-xl bg-red-500/15 text-mc-red flex items-center justify-center mx-auto text-lg">
                             <i class="fa-solid fa-scroll"></i>
                         </div>
-                        <h4 class="text-2xl font-bold font-display text-white">36 Куеста</h4>
+                        <h4 class="text-2xl font-bold font-display text-white">65 Куеста</h4>
                         <p class="text-xs text-gray-400 font-medium">Сезонни Мисии</p>
                     </div>
                 </div>
@@ -268,7 +268,7 @@
                     <div class="w-12 h-12 rounded-xl bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center text-yellow-400 text-xl">
                         <i class="fa-solid fa-trophy"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white font-display">36 Сезонни Куеста</h3>
+                    <h3 class="text-lg font-bold text-white font-display">65 Сезонни Куеста</h3>
                     <p class="text-xs text-gray-400 leading-relaxed">Избери завършените си мисии в 5 категории, трупай SMP Coins и се качи на Топ 3 подиума.</p>
                     <span class="text-xs font-bold text-yellow-400 inline-flex items-center gap-1 pt-1">
                         Виж Класацията <i class="fa-solid fa-arrow-right"></i>
@@ -455,7 +455,7 @@
                         <div>
                             <div class="flex flex-wrap items-center gap-2">
                                 <h2 class="text-2xl md:text-3xl font-bold font-display text-white">S37 SMP Класация & Куест Матрица</h2>
-                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">36 КУЕСТА АКТИВНИ</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">65 КУЕСТА АКТИВНИ</span>
                             </div>
                             <p class="text-xs md:text-sm text-gray-300 mt-1">Регистрирай своя Minecraft IGN, отбележи завършените мисии и влез в Топ 3 на сървъра!</p>
                         </div>
@@ -479,7 +479,7 @@
                     <div class="bg-black/50 p-4 rounded-2xl border border-white/5 flex items-start gap-3 hover:border-mc-primary/30 transition">
                         <span class="w-8 h-8 rounded-xl bg-mc-primary/20 border border-mc-primary/40 text-mc-primary font-bold flex items-center justify-center text-xs shrink-0">2</span>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">36 Сезонни Мисии</h4>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">65 Сезонни Мисии</h4>
                             <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">Филтрирай по категории и отбележи всички постижения, които си изпълнил.</p>
                         </div>
                     </div>
@@ -676,7 +676,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold font-display text-white">Регистрация / Редакция на S37 Профил</h3>
-                        <p class="text-xs text-gray-400">Въведи твоя IGN и отбележи завършените мисии от 36-те сезонни куеста.</p>
+                        <p class="text-xs text-gray-400">Въведи твоя IGN и отбележи завършените мисии от 65-те сезонни куеста.</p>
                     </div>
                 </div>
                 <button onclick="closeRegisterModal()" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white flex items-center justify-center transition">
@@ -722,16 +722,16 @@
             <div class="space-y-2.5">
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <label class="block text-xs font-bold text-yellow-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-list-check"></i> Завършени Сезонни Мисии (36 Куеста):
+                        <i class="fa-solid fa-list-check"></i> Завършени Сезонни Мисии (65 Куеста):
                     </label>
                     <div class="flex items-center gap-2">
                         <select id="modal-quest-category-filter" onchange="renderQuestChecklist()" class="bg-black/60 border border-white/15 rounded-lg px-2.5 py-1 text-[11px] text-gray-200 outline-none">
-                            <option value="all">Всички Категории (36)</option>
-                            <option value="Combat">⚔️ Combat & Bosses</option>
-                            <option value="Building">🏰 Building & Mega-Bases</option>
-                            <option value="Redstone">⚙️ Redstone & Farms</option>
-                            <option value="Exploration">🧭 Exploration & Treasures</option>
-                            <option value="Economy">💰 Economy & Community</option>
+                            <option value="all">Всички Категории (65)</option>
+                            <option value="Combat">⚔️ Combat & Bosses (14)</option>
+                            <option value="Building">🏰 Building & Mega-Bases (13)</option>
+                            <option value="Redstone">⚙️ Redstone & Farms (13)</option>
+                            <option value="Exploration">🧭 Exploration & Treasures (13)</option>
+                            <option value="Economy">💰 Economy & Community (12)</option>
                         </select>
                         <button onclick="toggleSelectAllQuests()" class="text-[11px] text-yellow-400 hover:underline font-semibold">Избери видимите</button>
                     </div>
@@ -746,7 +746,7 @@
             <div class="bg-gradient-to-r from-yellow-500/10 via-emerald-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
                 <div>
                     <span class="text-gray-400 block text-[10px] uppercase font-bold">Изчислени Мисии</span>
-                    <span id="preview-quests-count" class="text-lg font-bold text-emerald-400 font-display">0 / 36</span>
+                    <span id="preview-quests-count" class="text-lg font-bold text-emerald-400 font-display">0 / 65</span>
                 </div>
                 <div>
                     <span class="text-gray-400 block text-[10px] uppercase font-bold">Изчислени Coins</span>
@@ -846,9 +846,9 @@
         let userApiKey = localStorage.getItem('S37_VAULT_GEMINI_KEY') || '';
         let selectedOracleImageBase64 = null;
 
-        // Expanded Season 3 Master Quest List (36 Quests across 5 Categories)
+        // Expanded Season 3 Master Quest List (65 Quests across 5 Categories)
         const S37_QUESTS_MASTER = [
-            // COMBAT & BOSSES (8)
+            // COMBAT & BOSSES (14)
             { id: 'dragon', category: 'Combat', title: '🐉 Убиец на Ender Dragon', coins: 1500, desc: 'Победен Ender Dragon в The End' },
             { id: 'wither', category: 'Combat', title: '💀 Повелител на Wither', coins: 1200, desc: 'Призован и победен Wither Boss' },
             { id: 'warden', category: 'Combat', title: '🔊 Ловец на Warden', coins: 1600, desc: 'Победен Warden в Deep Dark' },
@@ -857,8 +857,14 @@
             { id: 'netherite_armor', category: 'Combat', title: '⚔️ Пълен Netherite Сет', coins: 900, desc: 'Full Netherite броня и меч с енчанти' },
             { id: 'pvp_champ', category: 'Combat', title: '🏆 S37 Арена Шампион', coins: 1100, desc: 'Спечелен турнир на сървърната арена' },
             { id: 'wither_skulls', category: 'Combat', title: '🦴 Колекционер на Черепи', coins: 600, desc: 'Събрани 15+ Wither Skeleton Skulls' },
+            { id: 'mace_master', category: 'Combat', title: '🔨 Майстор на Боздугана (Mace)', coins: 1350, desc: 'Изкован Mace и изпълнен Wind Burst удар' },
+            { id: 'breeze_slayer', category: 'Combat', title: '🌪️ Покорител на Вятъра', coins: 650, desc: 'Убити 25 Breeze в Trial Chambers' },
+            { id: 'ghast_return', category: 'Combat', title: '🔥 Return to Sender', coins: 500, desc: 'Убит Ghast с неговата собствена огнена топка' },
+            { id: 'dragon_respawn', category: 'Combat', title: '🔮 Повторно Призоваване', coins: 950, desc: 'Поставен End Crystal и победен втори дракон' },
+            { id: 'trident_lord', category: 'Combat', title: '🔱 Владетел на Тризъбеца', coins: 800, desc: 'Придобит Trident с Channeling и Riptide III' },
+            { id: 'undying_clutch', category: 'Combat', title: '✨ Безсмъртен Войн', coins: 700, desc: 'Оцеляване с Totem of Undying в критична битка' },
 
-            // BUILDING & MEGA-BASES (7)
+            // BUILDING & MEGA-BASES (13)
             { id: 'megabase', category: 'Building', title: '🏰 Архитект на Mega Base', coins: 1500, desc: 'Изградена база с над 100,000 блока' },
             { id: 'spawn_build', category: 'Building', title: '🏛️ Строител на Spawn', coins: 1000, desc: 'Участие в изграждането на централния Spawn' },
             { id: 'nether_hub', category: 'Building', title: '🚇 Nether Магистрала & Хъб', coins: 800, desc: 'Свързана база с леден тунел в Nether' },
@@ -866,8 +872,14 @@
             { id: 'castle_walls', category: 'Building', title: '🧱 Укрепена Крепост', coins: 650, desc: 'Изградени стени, кули и защитен ров' },
             { id: 'underwater_dome', category: 'Building', title: '🫧 Подводен Купол', coins: 850, desc: 'Изградена подводна стъклена база' },
             { id: 'sky_island', category: 'Building', title: '☁️ Летящ Остров', coins: 900, desc: 'Изграден персонализиран остров в небето' },
+            { id: 'custom_village', category: 'Building', title: '🏘️ Собствен Град / Селище', coins: 1100, desc: 'Построено тематично селище с над 10 сгради' },
+            { id: 'colosseum', category: 'Building', title: '🏟️ Бойна Арена / Колизеум', coins: 1200, desc: 'Построена арена за сървърни битки' },
+            { id: 'wizard_tower', category: 'Building', title: '🧙 Кула на Магьосника', coins: 600, desc: 'Висока кула с библиотека и стая за отвари' },
+            { id: 'japanese_temple', category: 'Building', title: '⛩️ Японски Храм & Градина', coins: 850, desc: 'Изграден храм в Cherry Grove биом' },
+            { id: 'rail_network', category: 'Building', title: '🚂 Железопътна Мрежа', coins: 700, desc: 'Над 1000 блока релси между различни бази' },
+            { id: 'pixel_monument', category: 'Building', title: '🗿 Гигантска Статуя', coins: 750, desc: 'Изградена 3D статуя с височина над 50 блока' },
 
-            // REDSTONE & FARMS (7)
+            // REDSTONE & FARMS (13)
             { id: 'ironfarm', category: 'Redstone', title: '⚙️ Индустриална Iron Farm', coins: 900, desc: 'Автоматична ферма за желязо 24/7' },
             { id: 'goldfarm', category: 'Redstone', title: '🪙 Nether Gold & XP Farm', coins: 1100, desc: 'Високоефективна ферма на покрива на Nether' },
             { id: 'raid_farm', category: 'Redstone', title: '🧪 Автоматична Raid Farm', coins: 1300, desc: 'Ферма за Totems of Undying и Emeralds' },
@@ -875,8 +887,14 @@
             { id: 'creeper_farm', category: 'Redstone', title: '🧨 Gunpowder / Creeper Farm', coins: 750, desc: 'Непрекъснато производство на барут' },
             { id: 'trading_hall', category: 'Redstone', title: '🧑‍🌾 Villager Trading Hall', coins: 850, desc: 'Зала с 20+ зомбифицирани търговци' },
             { id: 'guardian_farm', category: 'Redstone', title: '🔱 Guardian XP & Prismarine Farm', coins: 1400, desc: 'Пресушен монумент с работеща ферма' },
+            { id: 'enderman_farm', category: 'Redstone', title: '🌌 Enderman XP Farm', coins: 800, desc: 'Бърза XP ферма в The End (Ниво 30 за секунди)' },
+            { id: 'super_smelter', category: 'Redstone', title: '🔥 Супер Пещ (64 Furnaces)', coins: 700, desc: 'Автоматична система за топене на стакове' },
+            { id: 'slime_farm', category: 'Redstone', title: '🟩 Автоматична Slime Farm', coins: 850, desc: 'Изкопан Slime Chunk до Bedrock за лепкави бутала' },
+            { id: 'shulker_farm', category: 'Redstone', title: '🟣 Автоматична Shulker Farm', coins: 1550, desc: 'Сложна редстоун ферма за Shulker Shells' },
+            { id: 'piston_door', category: 'Redstone', title: '🚪 Тайна 4x4 Piston Врата', coins: 650, desc: 'Скрит редстоун вход към тайна стая' },
+            { id: 'auto_brewer', category: 'Redstone', title: '⚗️ Автоматична Лаборатория', coins: 600, desc: 'Машина за автоматично варене на отвари' },
 
-            // EXPLORATION & TREASURES (7)
+            // EXPLORATION & TREASURES (13)
             { id: 'elytra', category: 'Exploration', title: '🚀 Първи Полет с Elytra', coins: 700, desc: 'Намерена Елитра от End Ship' },
             { id: 'ancient_city', category: 'Exploration', title: '🕯️ Изследовател на Ancient City', coins: 800, desc: 'Плячкосан древен град и намерен Silence Trim' },
             { id: 'debris_miner', category: 'Exploration', title: '💎 Миньор на Ancient Debris', coins: 850, desc: 'Изкопани над 250 блока Ancient Debris' },
@@ -884,75 +902,36 @@
             { id: 'all_biomes', category: 'Exploration', title: '🌍 Пътешественик (Adventuring Time)', coins: 1000, desc: 'Посетени всички биоми в света' },
             { id: 'sniffer_egg', category: 'Exploration', title: '🦕 Археолог (Sniffer & Torchflower)', coins: 550, desc: 'Излюпен Sniffer от Ocean Ruins' },
             { id: 'heart_sea', category: 'Exploration', title: '💙 Активиран Conduit', coins: 500, desc: 'Сглобен и активиран подводен Conduit' },
+            { id: 'armor_trims', category: 'Exploration', title: '🛡️ Колекционер на Armor Trims', coins: 1250, desc: 'Събрани поне 12 различни Smithing Templates' },
+            { id: 'music_discs', category: 'Exploration', title: '💿 DJ на S37 (Всички Плочи)', coins: 900, desc: 'Събрана колекция от редки музикални плочи' },
+            { id: 'woodland_mansion', category: 'Exploration', title: '🏚️ Покорител на Woodland Mansion', coins: 850, desc: 'Намерено и изчистено горско имение' },
+            { id: 'bastion_raider', category: 'Exploration', title: '🐷 Обир на Bastion Remnant', coins: 750, desc: 'Намерен Netherite Upgrade Template в Bastion' },
+            { id: 'dragon_head', category: 'Exploration', title: '🐲 Трофей: Главата на Дракона', coins: 800, desc: 'Взета Dragon Head от носа на End Ship' },
+            { id: 'world_border', category: 'Exploration', title: '🧭 Откривател на Далечни Земи', coins: 650, desc: 'Пътуване на над 25,000 блока от Spawn' },
 
-            // ECONOMY & COMMUNITY (7)
+            // ECONOMY & COMMUNITY (12)
             { id: 'spawn_shop', category: 'Economy', title: '🏪 Собствен Магазин на Spawn', coins: 650, desc: 'Открит активен магазин в търговския квартал' },
             { id: 'beacon_lvl4', category: 'Economy', title: '✨ Пълен Beacon (Level 4)', coins: 750, desc: 'Пирамида от 164 блока за максимален Beacon' },
             { id: 'netherite_beacon', category: 'Economy', title: '👑 Легендарен Netherite Beacon', coins: 2500, desc: 'Върховното постижение на богатството в S37' },
             { id: 'diamond_stack', category: 'Economy', title: '💠 Милионер (10+ Stacks Diamonds)', coins: 1100, desc: 'Натрупани над 640 диаманта' },
             { id: 'event_host', category: 'Economy', title: '🎪 Организатор на Мини-Игра', coins: 800, desc: 'Създадена арена или игра за общността' },
             { id: 'lore_quest', category: 'Economy', title: '📜 Пазител на S37 Lore', coins: 500, desc: 'Разкрити тайните на Древния Oracle' },
-            { id: 'helper_badge', category: 'Economy', title: '🤝 Помощник на Новаци', coins: 450, desc: 'Осигурен стартов екип за нови играчи' }
+            { id: 'helper_badge', category: 'Economy', title: '🤝 Помощник на Новаци', coins: 450, desc: 'Осигурен стартов екип за нови играчи' },
+            { id: 'guild_founder', category: 'Economy', title: '🚩 Основател на Клан / Faction', coins: 600, desc: 'Създаден активен клан с поне 3-ма членове' },
+            { id: 'emerald_tycoon', category: 'Economy', title: '💚 Изумруден Магнат', coins: 850, desc: 'Натрупани над 20 блока с Emerald Blocks' },
+            { id: 'public_farm', category: 'Economy', title: '🌾 Обществена Ферма на Spawn', coins: 550, desc: 'Изградена безплатна ферма за храна за всички' },
+            { id: 'casino_owner', category: 'Economy', title: '🎰 Собственик на Мини-Казино', coins: 750, desc: 'Създадена честна редстоун игра с награди' },
+            { id: 'season_veteran', category: 'Economy', title: '🎖️ Ветеран на Сезон 3', coins: 1000, desc: 'Активно участие и принос за развитието на S37' }
         ];
 
         let selectedFilterRank = 'all';
         let selectedModalCheckboxes = new Set();
 
-        // Rich Default / Saved Player Leaderboard
-        let leaderboardPlayers = JSON.parse(localStorage.getItem('S37_LEADERBOARD_PLAYERS')) || [
-            { 
-                ign: 'EnderLord_99', 
-                playerClass: '⚔️ PvP Warrior', 
-                faction: 'Ender Syndicate',
-                questsCompleted: ['dragon', 'wither', 'warden', 'megabase', 'ironfarm', 'goldfarm', 'netherite_armor', 'elytra', 'beacon_lvl4', 'pvp_champ']
-            },
-            { 
-                ign: 'VortexKnight', 
-                playerClass: '🏗️ Mega Builder', 
-                faction: 'Emerald Guild',
-                questsCompleted: ['dragon', 'megabase', 'spawn_build', 'nether_hub', 'map_art', 'ironfarm', 'elytra', 'spawn_shop']
-            },
-            { 
-                ign: 'RedstoneCraft', 
-                playerClass: '⚡ Redstoneer', 
-                faction: 'Automata Clan',
-                questsCompleted: ['ironfarm', 'goldfarm', 'raid_farm', 'storage_system', 'trading_hall', 'elytra', 'beacon_lvl4']
-            }
-        ];
+        // Clean Leaderboard (No pre-filled mock players; loads only real registered players)
+        let leaderboardPlayers = JSON.parse(localStorage.getItem('S37_LEADERBOARD_PLAYERS')) || [];
 
-        // Server Ideas State (Persisted in localStorage)
-        let serverIdeas = JSON.parse(localStorage.getItem('S37_SERVER_IDEAS')) || [
-            {
-                id: 'idea-1',
-                author: 'EnderLord_99',
-                category: '🎉 Ивенти & Турнири',
-                title: 'Седмичен End Dragon & Elytra Race Турнир',
-                desc: 'Всяка събота вечер да се организира състезание с Елитри през пръстени в небето с награди в SMP Coins.',
-                votes: 18,
-                voted: false,
-                date: 'Преди 2 дни'
-            },
-            {
-                id: 'idea-2',
-                author: 'VortexKnight',
-                category: '🏰 Строежи & Spawn',
-                title: 'Разширение на Търговския Квартал на Spawn',
-                desc: 'Да добавим нов остров с портал за магазини на играчите, за да има повече място за нови търговци.',
-                votes: 14,
-                voted: false,
-                date: 'Преди 1 ден'
-            },
-            {
-                id: 'idea-3',
-                author: 'RedstoneCraft',
-                category: '⚙️ Плъгини & Механики',
-                title: 'Динамична Уеб Карта (Dynmap / BlueMap)',
-                desc: 'Интегриране на 3D карта на света в реално време, за да виждаме къде се намират базите и пътищата.',
-                votes: 24,
-                voted: false,
-                date: 'Днес'
-            }
-        ];
+        // Clean Server Ideas State (No pre-filled mock ideas; loads only real player ideas)
+        let serverIdeas = JSON.parse(localStorage.getItem('S37_SERVER_IDEAS')) || [];
 
         let selectedIdeaCategory = 'all';
         function switchTab(tabId) {
